@@ -2,15 +2,15 @@ library(data.table)
 library(plotly)
 library(dplyr)
 library(foreign)
-install.packages("geosphere")
+# install.packages("geosphere")
 library("geosphere")
-install.packages("Imap")
+# install.packages("Imap")
 library("Imap")
 library("tidyverse")
 
 
 # Airbnb ------------------------------------------------------------------------------------------
-airbnb=fread("C:/temp/projet/listings.csv",stringsAsFactors=FALSE, encoding = 'UTF-8') %>%
+airbnb=fread("./input/listings.csv",stringsAsFactors=FALSE, encoding = 'UTF-8') %>%
   mutate(price=as.numeric(gsub(",","",as.character(substr(price,2,100)))))
 
 View(head(airbnb))
