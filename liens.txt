@@ -1,0 +1,4 @@
+https://github.com/intensive-carlito/project-ds
+
+http://insideairbnb.com/get-the-data.html
+https://data.ratp.fr/explore/dataset/accessibilite-des-gares-et-stations-metro-et-rer-ratp/export/
