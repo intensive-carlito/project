@@ -2,10 +2,10 @@ library(data.table)
 library(plotly)
 library(dplyr)
 library(foreign)
-# install.packages("geosphere")
+# install.packages("plotly")
 library("geosphere")
 # install.packages("Imap")
-library("Imap")
+# library("Imap")
 library("tidyverse")
 
 
