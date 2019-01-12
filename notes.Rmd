@@ -57,3 +57,7 @@ Web scrapping pour les bars et les monuments.
 ```curl -XPOST "https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20181214T151349Z.e323c6a0eeb6c59d.6ed57788f95d2a05d4269fddb847986f8769b990&text=ce%20chat%20est%20mignon&lang=fr-en&format=plain"```
 
 fait la traduction de *Ce chat est mignon* en *this cat is cute*.
+
+Problème rencontré : Lors d'une utilisation massive de la fonction `translate` dans une datatable, il arrive un moment où R Studio crashe.
+Pour palier à ce problème, j'ai fait un petit programme en Go qui fait le même travail.
+
