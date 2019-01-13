@@ -3,6 +3,7 @@ package main
 import (
     "bufio"
     "encoding/csv"
+    "encoding/json"
     "fmt"
     "io"
     "log"
@@ -11,17 +12,29 @@ import (
     "io/ioutil"
     "net/url"
     "strconv"
+    "strings"
 )
+
+type Row struct {
+    Code int
+    Lang string
+    Text []string
+}
 
 //curl -XPOST "https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20181214T151349Z.e323c6a0eeb6c59d.6ed57788f95d2a05d4269fddb847986f8769b990&text=ce%20chat%20est%20mignon&lang=fr-en&format=plain"
 
-func translate2(str string) string {
-    return str + " translation"
+func translate2(str string) Row {
+    var retval Row
+    ret := []byte(`{"code":200,"lang":"fr-en","text":["Hello world"]}`)
+    err := json.Unmarshal(ret, &retval)
+    if err != nil {
+        log.Fatal(err);
+    }
+    return retval
 }
 
-func translate(str string) string {
+func translate(str string) Row {
     translatorUrl := "https://translate.yandex.net/api/v1.5/tr.json/translate"
-    fmt.Println("URL:>", translatorUrl)
 
     resp, err := http.PostForm(translatorUrl, url.Values{
         "key": {"trnsl.1.1.20181214T151349Z.e323c6a0eeb6c59d.6ed57788f95d2a05d4269fddb847986f8769b990"},
@@ -36,7 +49,17 @@ func translate(str string) string {
         log.Fatal("errorination happened reading the body", err)
     }
 
-    return string(body[:])
+    var retval Row
+    err = json.Unmarshal(body, &retval)
+    if err != nil {
+        log.Fatal(err);
+    }
+    return retval
+}
+
+func main1() {
+    ret := translate("Bonjour les amis")
+    fmt.Println(ret.Text)
 }
 
 func main() {
@@ -71,13 +94,17 @@ func main() {
         comment := row[0]
         num := row[1]
         lang := row[2]
-        var comment_in_english string
+        var comment_in_english Row
+        var ll, cmt string
         if lang != "english" {
-            comment_in_english = translate2(comment)
+            comment_in_english = translate(comment)
+            cmt = strings.Join(comment_in_english.Text, " - ")
+            ll = comment_in_english.Lang
         } else {
-            comment_in_english = comment
+            cmt = comment
+            ll = "en-en"
         }
-        err = writer.Write([]string{ comment, num, lang, comment_in_english })
+        err = writer.Write([]string{ comment, num, lang, ll, cmt })
         if err != nil {
             log.Fatal(err)
         }
