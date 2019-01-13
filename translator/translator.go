@@ -19,6 +19,7 @@ type Row struct {
     Code int
     Lang string
     Text []string
+    Message string
 }
 
 //curl -XPOST "https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20181214T151349Z.e323c6a0eeb6c59d.6ed57788f95d2a05d4269fddb847986f8769b990&text=ce%20chat%20est%20mignon&lang=fr-en&format=plain"
@@ -54,6 +55,11 @@ func translate(str string) Row {
     if err != nil {
         log.Fatal(err);
     }
+
+    if retval.Code != 200 {
+        log.Fatal("It is the end for today... : " + retval.Message)
+    }
+
     return retval
 }
 
@@ -84,6 +90,7 @@ func main() {
         if index++; index % 100 == 0 {
             fmt.Println("Row " + strconv.Itoa(index) + " is translated")
         }
+        fmt.Print(".")
 
         row, err := reader.Read()
         if err == io.EOF {
