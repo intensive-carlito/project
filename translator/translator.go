@@ -11,6 +11,7 @@ import (
     "net/http"
     "io/ioutil"
     "net/url"
+    "regexp"
     "strconv"
     "strings"
 )
@@ -35,40 +36,65 @@ func translate2(str string) Row {
 }
 
 func translate(str string) Row {
-    translatorUrl := "https://translate.yandex.net/api/v1.5/tr.json/translate"
+    translatorUrl := "https://translate.googleapis.com/translate_a/single"
 
-    resp, err := http.PostForm(translatorUrl, url.Values{
-        "key": {"trnsl.1.1.20181214T151349Z.e323c6a0eeb6c59d.6ed57788f95d2a05d4269fddb847986f8769b990"},
-        "text": { str },
-        "lang": { "en" },
-        "format": {"plain"} })
-
-    defer resp.Body.Close()
-    body, err := ioutil.ReadAll(resp.Body)
-
-    if nil != err {
-        log.Fatal("errorination happened reading the body", err)
-    }
-
-    var retval Row
-    err = json.Unmarshal(body, &retval)
+    resp, err := http.Get(translatorUrl + "?client=gtx&sl=auto&tl=en&dt=t&q=" + url.QueryEscape(str))
     if err != nil {
-        log.Fatal(err);
+        panic(err)
     }
+    defer resp.Body.Close()
+    bytes, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        panic(err)
+    }
+    content := string(bytes)
+    r := regexp.MustCompile(`\[\[\["(.*)","(.*)",.*,.*,.*\]\],.*,"(.*)",.*`)
+    match := r.FindStringSubmatch(content)
 
-    if retval.Code != 200 {
-        log.Fatal("It is the end for today... : " + retval.Message)
-    }
+    retval := Row {
+        200,
+        match[3] + "-en",
+        []string{ match[1] },
+        "" }
 
     return retval
 }
 
-func main1() {
+//func translate(str string) Row {
+//    translatorUrl := "https://translate.yandex.net/api/v1.5/tr.json/translate"
+//
+//    resp, err := http.PostForm(translatorUrl, url.Values{
+//        "key": {"trnsl.1.1.20181214T151349Z.e323c6a0eeb6c59d.6ed57788f95d2a05d4269fddb847986f8769b990"},
+//        "text": { str },
+//        "lang": { "en" },
+//        "format": {"plain"} })
+//
+//    defer resp.Body.Close()
+//    body, err := ioutil.ReadAll(resp.Body)
+//
+//    if nil != err {
+//        log.Fatal("errorination happened reading the body", err)
+//    }
+//
+//    var retval Row
+//    err = json.Unmarshal(body, &retval)
+//    if err != nil {
+//        log.Fatal(err);
+//    }
+//
+//    if retval.Code != 200 {
+//        log.Fatal("It is the end for today... : " + retval.Message)
+//    }
+//
+//    return retval
+//}
+
+func main() {
     ret := translate("Bonjour les amis")
     fmt.Println(ret.Text)
 }
 
-func main() {
+func main1() {
     infile, err := os.Open("../to_translate.csv")
     if err != nil {
         log.Fatal(err)
