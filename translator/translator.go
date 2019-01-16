@@ -8,6 +8,7 @@ import (
     "io"
     "log"
     "os"
+    "time"
     "net/http"
     "io/ioutil"
     "net/url"
@@ -25,17 +26,8 @@ type Row struct {
 
 //curl -XPOST "https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20181214T151349Z.e323c6a0eeb6c59d.6ed57788f95d2a05d4269fddb847986f8769b990&text=ce%20chat%20est%20mignon&lang=fr-en&format=plain"
 
-func translate2(str string) Row {
-    var retval Row
-    ret := []byte(`{"code":200,"lang":"fr-en","text":["Hello world"]}`)
-    err := json.Unmarshal(ret, &retval)
-    if err != nil {
-        log.Fatal(err);
-    }
-    return retval
-}
-
-func translate(str string) Row {
+func translate_google(str string) Row {
+    time.Sleep(time.Second)
     translatorUrl := "https://translate.googleapis.com/translate_a/single"
 
     resp, err := http.Get(translatorUrl + "?client=gtx&sl=auto&tl=en&dt=t&q=" + url.QueryEscape(str))
@@ -50,6 +42,9 @@ func translate(str string) Row {
     content := string(bytes)
     r := regexp.MustCompile(`\[\[\["(.*)","(.*)",.*,.*,.*\]\],.*,"(.*)",.*`)
     match := r.FindStringSubmatch(content)
+    if len(match) == 0 {
+        panic("No more result for now...")
+    }
 
     retval := Row {
         200,
@@ -60,48 +55,48 @@ func translate(str string) Row {
     return retval
 }
 
-//func translate(str string) Row {
-//    translatorUrl := "https://translate.yandex.net/api/v1.5/tr.json/translate"
-//
-//    resp, err := http.PostForm(translatorUrl, url.Values{
-//        "key": {"trnsl.1.1.20181214T151349Z.e323c6a0eeb6c59d.6ed57788f95d2a05d4269fddb847986f8769b990"},
-//        "text": { str },
-//        "lang": { "en" },
-//        "format": {"plain"} })
-//
-//    defer resp.Body.Close()
-//    body, err := ioutil.ReadAll(resp.Body)
-//
-//    if nil != err {
-//        log.Fatal("errorination happened reading the body", err)
-//    }
-//
-//    var retval Row
-//    err = json.Unmarshal(body, &retval)
-//    if err != nil {
-//        log.Fatal(err);
-//    }
-//
-//    if retval.Code != 200 {
-//        log.Fatal("It is the end for today... : " + retval.Message)
-//    }
-//
-//    return retval
-//}
+func translate(str string) Row {
+    translatorUrl := "https://translate.yandex.net/api/v1.5/tr.json/translate"
 
-func main() {
+    resp, err := http.PostForm(translatorUrl, url.Values{
+        "key": {"trnsl.1.1.20181214T151349Z.e323c6a0eeb6c59d.6ed57788f95d2a05d4269fddb847986f8769b990"},
+        "text": { str },
+        "lang": { "en" },
+        "format": {"plain"} })
+
+    defer resp.Body.Close()
+    body, err := ioutil.ReadAll(resp.Body)
+
+    if nil != err {
+        log.Fatal("errorination happened reading the body", err)
+    }
+
+    var retval Row
+    err = json.Unmarshal(body, &retval)
+    if err != nil {
+        log.Fatal(err);
+    }
+
+    if retval.Code != 200 {
+        log.Fatal("It is the end for today... : " + retval.Message)
+    }
+
+    return retval
+}
+
+func main1() {
     ret := translate("Bonjour les amis")
     fmt.Println(ret.Text)
 }
 
-func main1() {
-    infile, err := os.Open("../to_translate.csv")
+func main() {
+    infile, err := os.Open("../to_translate2.csv")
     if err != nil {
         log.Fatal(err)
     }
     defer infile.Close()
 
-    outfile, err := os.Create("../translations.csv")
+    outfile, err := os.Create("../translations3.csv")
     if err != nil {
         log.Fatal(err)
     }
