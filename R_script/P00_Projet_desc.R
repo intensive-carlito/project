@@ -1,28 +1,28 @@
+library(dplyr)
 library(data.table)
 library(plotly)
-library(dplyr)
 library(foreign)
-# install.packages("plotly")
+# install.packages("geosphere")
 library("geosphere")
-# install.packages("Imap")
-# library("Imap")
+# install.packages("colorspace")
+library("ggplot2")
 library("tidyverse")
 
 
 # Airbnb ------------------------------------------------------------------------------------------
 airbnb=fread("./input/listings.csv",stringsAsFactors=FALSE, encoding = 'UTF-8') %>%
-  filter(substr(zipcode,1,2)=="75") %>%
+  dplyr::filter(substr(zipcode,1,2)=="75") %>%
   mutate(price=as.numeric(gsub(",","",as.character(substr(price,2,100)))),
          security_deposit=as.numeric(gsub(",","",as.character(substr(security_deposit,2,100)))),
          zipcode=substr(zipcode,1,5)
-         ) 
+  ) 
 airbnb$host_since=as.Date(airbnb$host_since,"%Y-%m-%d")
 airbnb$price_cut<-cut(airbnb$price, seq(0,1000,100))
 
 airbnb = mutate(airbnb, price_cut = as.factor(ifelse(price<=200,as.character(cut(price, seq(0,200,25))),
-                                           ifelse(price<=500,as.character(cut(price, seq(200,500,25))),
-                                                  ifelse(price<=1000,as.character(cut(price, seq(500,1000,100))),"]1000,infini[")))))
-                
+                                                     ifelse(price<=500,as.character(cut(price, seq(200,500,25))),
+                                                            ifelse(price<=1000,as.character(cut(price, seq(500,1000,100))),"]1000,infini[")))))
+
 toto=as.data.frame(table(airbnb$first_review)) %>% filter(Var1!="")
 plot_ly(data=toto, x=~Var1, y=~Freq, type="scatter", mode = 'lines')
 

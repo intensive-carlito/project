@@ -11,10 +11,38 @@ function(input, output) {
   })
   
   output$mymap <- renderLeaflet({
+    
     leaflet() %>%
-      addProviderTiles(providers$Stamen.TonerLite,options = providerTileOptions(noWrap = TRUE)) %>%
-      addMarkers(data = airbnb[1:200,],~longitude, ~latitude, popup = ~as.character(price), label = ~as.character(name)) %>%
-      addPolygons(data= arrondissement,stroke = TRUE, smoothFactor = 0.2, fillOpacity = 0.01) 
+      addProviderTiles(providers$Esri,options = providerTileOptions(noWrap = TRUE)) %>%
+      addMarkers(data = airbnb,~longitude, ~latitude, popup = ~as.character(price), label = ~as.character(name),clusterOptions = markerClusterOptions()) %>%
+      addPolygons(data= arrondissement,stroke = TRUE, smoothFactor = 0.2, fillOpacity = 0.01) #%>%
+    # addHeatmap(data = airbnb, intensity=~price, lng=~longitude, lat=~latitude, max=.6, blur = 60)
+    
+  })
+  
+  
+  Table_normalisation <- reactive({
+    normalise= GET(paste0("https://api-adresse.data.gouv.fr/search/?q=",chartr(",_/ ","+++++",input$inputAd)))
+    ad=as.data.frame(content(normalise)$features[[1]])
+    colnames(ad)[c(1,2)] <- c("longitude","latitude")
+    temp=select(sample_frac(airbnb,0.1),latitude,longitude,neighbourhood_cleansed)
+    
+    mat2 <- as.data.frame(distm(setDT(temp)[,.(longitude,latitude)], setDT(ad)[,.(longitude,latitude)], fun=distVincentyEllipsoid))%>%
+      cbind(select(temp,neighbourhood_cleansed)) %>% arrange( V1) %>% head(1) %>% select(neighbourhood_cleansed)
+    ad = cbind(ad,mat2)
+    ad
+  })
+  
+  output$table <- renderTable(select(Table_normalisation(),properties.label,properties.type,longitude,latitude,neighbourhood_cleansed))
+  
+  output$mymap_norm <- renderLeaflet({
+    
+    leaflet() %>%
+      addProviderTiles(providers$Esri,options = providerTileOptions(noWrap = TRUE)) %>%
+      addMarkers(data = Table_normalisation(),~longitude, ~latitude, label = ~as.character(properties.label)) %>%
+      addPolygons(data= arrondissement,stroke = TRUE, smoothFactor = 0.2, fillOpacity = 0.01) #%>%
+    # addHeatmap(data = airbnb, intensity=~price, lng=~longitude, lat=~latitude, max=.6, blur = 60)
+    
   })
   
 }
