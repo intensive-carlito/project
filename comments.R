@@ -18,10 +18,18 @@ translate <- function(str) {
 }
 
 comments <- fread("./input/reviews.csv")
-to_translate <- comments[,.N, by=.(comments)]
+to_translate <- comments[,.N, by=.(comments)][order(lang)]
 to_translate[, lang:=textcat(comments)]
 to_translate[lang=="estonian", comment_in_english:=translate(comments)[2], by=comments]
 to_translate[lang=="finnish", comment_in_english:=translate(comments)[2], by=comments]
 to_translate[lang=="breton", comment_in_english:=translate(comments)[2], by=comments]
 to_translate[lang=="english", comment_in_english:=comments, by=comments]
 to_translate[is.na(comment_in_englishlang), comment_in_english:=translate(comments)[2], by=comments]
+ordered_to_translate <- to_translate[order(lang)]
+unique(ordered_to_translate[lang!="english", .(lang)])
+esperanto <-ordered_to_translate[lang == 'esperanto']
+estonian <- ordered_to_translate[lang == 'estonian']
+finnish <- ordered_to_translate[lang == 'finnish']
+french <- ordered_to_translate[lang == 'french']
+
+fwrite(x = french, "french.csv")
