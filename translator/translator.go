@@ -27,7 +27,7 @@ type Row struct {
 //curl -XPOST "https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20181214T151349Z.e323c6a0eeb6c59d.6ed57788f95d2a05d4269fddb847986f8769b990&text=ce%20chat%20est%20mignon&lang=fr-en&format=plain"
 
 func translate_google(str string) Row {
-    time.Sleep(time.Second)
+    time.Sleep(2 * time.Second)
     translatorUrl := "https://translate.googleapis.com/translate_a/single"
 
     resp, err := http.Get(translatorUrl + "?client=gtx&sl=auto&tl=en&dt=t&q=" + url.QueryEscape(str))
