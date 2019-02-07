@@ -69,13 +69,13 @@ func main1() {
 }
 
 func main() {
-    infile, err := os.Open("../french6.csv")
+    infile, err := os.Open("../french7.csv")
     if err != nil {
         log.Fatal(err)
     }
     defer infile.Close()
 
-    outfile, err := os.Create("../translations-french6.csv")
+    outfile, err := os.Create("../translations-french7.csv")
     if err != nil {
         log.Fatal(err)
     }
