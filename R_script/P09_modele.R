@@ -1,5 +1,5 @@
 library("randomForest")
-# # airbnb=readRDS("./R_data/airbnb.RDS")
+# airbnb=readRDS("../R_data/airbnb.RDS")
 # P01_dist_RATP=readRDS("./R_data/P01_dist_RATP.RDS")
 airbnb2=head(airbnb,100)
 

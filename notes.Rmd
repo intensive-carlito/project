@@ -8,8 +8,24 @@ output: html_notebook
 * `listings.csv` qui contient l'ensemble des appartements (60 000 appartements)
 * `reviews.csv` les revues des clients (1 000 000 de lignes)
 * `accessibilite-des-gares-et-stations-metro-et-rer.csv` Les stations 400 stations de métro avec leurs positions.
+* `quartiers.csv` : Paris est découpé en 80 quartiers, plus précis que les arrondissements.
+
 * Monuments de Paris sur la base Mérimée (2000 données)
 * timeout.fr les cents meilleurs bars de Paris. On peut y faire du scrapping pour récupérer les adresses. <<<et grace à adresse.data.gouv.fr on peut récupérer les coordonnées GPS.
+
+# Fabrication des quartiers
+
+Nous utilisons https://opendata.paris.fr/explore/dataset/quartier_paris/export/
+
+pour télécharger les quartiers de Paris.
+
+Nous avons exporté les id, latitudes, longitudes des différentes locations au format csv.
+
+Ces deux sources ont été importées dans QGIS. L'outil d'intersection nous a alors permis de déterminer à quels quartiers appartiennent chacune des locations.
+Après cette opération, nous avons exporté le résultat dans le fichier `quartiers.csv`.
+
+![QGIS](./images/qgis.png)
+
 
 # Premiers essais
 
