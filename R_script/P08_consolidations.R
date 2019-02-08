@@ -58,7 +58,9 @@ P08_airbnb=dplyr::select(airbnb,
   left_join(quartiers, by="id") %>%
   left_join(P01_dist_RATP, by="id") %>%
   left_join(select(P04_dist_monuments,id,mon_100=n_100,mon_200=n_200,mon_500=n_500,mon_1000=n_1000), by="id") %>%
-  arrange(id) %>% filter(!is.na(l_qu))
+  arrange(id) %>% filter(!is.na(l_qu)) %>%
+  mutate(l_qu=as.factor(l_qu)
+)
   
 # Retrait données extremes
 Quant98 <- quantile(P08_airbnb$price,0.98)
