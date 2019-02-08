@@ -33,7 +33,8 @@ finnish <- ordered_to_translate[lang == 'finnish']
 french <- ordered_to_translate[lang == 'french']
 fwrite(x = french, "french.csv")
 
-french_tmp <- french[1:20000]
+# Une requête permettant d'avoir du bon et du moins bon
+french_tmp <- french[comments %like% "nul"]
 french_tmp <- french_tmp[,comment_in_english:=NA]
 french_tmp <- french_tmp[,.(comments, N, lang)]
 
@@ -130,3 +131,40 @@ fit
 plot(fit, hang=-1)
 groups <- cutree(fit, k=6)   # "k=" defines the number of clusters you are using   
 rect.hclust(fit, k=6, border="red")
+
+
+###############################
+# text2vec
+
+library(text2vec)
+wiki = readLines("~/Projets/exos-R/text-mining/formation tm SC-PC/text8", n = 1, warn = F)
+tokens = space_tokenizer(wiki)
+
+# creation d'un vocabulaire de 1-grammes
+it = itoken(tokens, progressbar = FALSE)
+vocab = create_vocabulary(it)
+# on supprime les n-grammes rares
+vocab = prune_vocabulary(vocab, term_count_min = 5L)
+vectorizer = vocab_vectorizer(vocab)
+# co-occurrence avec un contexte de taille 5
+tcm = create_tcm(it, vectorizer, skip_grams_window = 5L)
+
+# Il est temps de factoriser la matrice TCM avec l'algorithme GloVe
+glove = GlobalVectors$new(word_vectors_size = 50, vocabulary = vocab, x_max = 10)
+wv_main = glove$fit_transform(tcm, n_iter = 50, convergence_tol = 0.01)
+save(wv_main,glove,file="GloVe.RData")
+dim(wv_main)
+
+wv_context = glove$components
+dim(wv_context)
+
+#On ajoute les deux matrices qui sont transposées l'une de l'autre
+# A creuser mais ça donne de meilleurs résultats
+
+word_vectors = wv_main + t(wv_context)
+
+berlin = word_vectors["paris", , drop = FALSE] - 
+  word_vectors["france", , drop = FALSE] + 
+  word_vectors["germany", , drop = FALSE]
+cos_sim = sim2(x = word_vectors, y = berlin, method = "cosine", norm = "l2")
+head(sort(cos_sim[,1], decreasing = TRUE), 5)

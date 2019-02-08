@@ -50,5 +50,5 @@ boxplot(price~neighbourhood_cleansed,data=airbnb2)
 monuments=fread("./input/merimee-MH-valid.csv",stringsAsFactors=FALSE, encoding = 'UTF-8') %>% filter(DPT=="75")
 
 # 
-# saveRDS(airbnb,"./R_data/airbnb.RDS")
+saveRDS(airbnb,"./R_data/airbnb.RDS")
 # # airbnb=readRDS("./R_data/airbnb.RDS")
