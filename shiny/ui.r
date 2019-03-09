@@ -32,6 +32,8 @@ dashboardPage(
       tabItem("carto",
               fluidRow(
                 valueBoxOutput("nb_appart"),
+                checkboxInput("heatMapCheckBox", "Prix par zone"),
+                sliderInput("heatMapSlider", label = "Slider Range", min = 0, max = 1, value = c(0, 1), step = 0.02),
                 leafletOutput("mymap")
               )
       ),

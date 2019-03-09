@@ -1,9 +1,11 @@
 ---
 title: "Air BnB à Paris"
-output: html_notebook
+output: beamer_presentation
 ---
 
-# La source principale est inside airbnb
+---
+
+# La source principale est _inside airbnb_
 
 * `listings.csv` qui contient l'ensemble des appartements (60 000 appartements)
 * `reviews.csv` les revues des clients (1 000 000 de lignes)
@@ -12,6 +14,8 @@ output: html_notebook
 
 * Monuments de Paris sur la base Mérimée (2000 données)
 * timeout.fr les cents meilleurs bars de Paris. On peut y faire du scrapping pour récupérer les adresses grace à adresse.data.gouv.fr on peut récupérer les coordonnées GPS.
+
+---
 
 # Fabrication des quartiers
 
@@ -34,6 +38,9 @@ Une seconde étape est d'utiliser à nouveau adresse.data.gouv.fr pour récupér
 Ensuite, pour chaque logement, on compte combien de monuments sont à moins de 100, 200m, 500m et 1km.
 Le résultat est stocké dans la table `P04_dist_monuments`.
 
+## Remarques
+
+* distances au centre
 
 # Premiers essais
 
@@ -45,7 +52,7 @@ Le bilan est qu'on obtient deux composantes importantes qui sont *la longueur de
 On peut expliquer que le nombre de mots change beaucoup et il y a presque autant de cas que d'appartements présentés, ça peut expliquer un peu la représentativité.
 Idem pour le délai d'existence.
 
-On a ensuite fait des tranches de prix et transformé ces prix en factors.
+On a ensuite fait des tranches de prix que l'on a transformés en factors.
 L'erreur est à 80%.
 
 On a regardé la répartition des prix par lieu dans deux cas :
@@ -85,3 +92,12 @@ fait la traduction de *Ce chat est mignon* en *this cat is cute*.
 Problème rencontré : Lors d'une utilisation massive de la fonction `translate` dans une datatable, il arrive un moment où R Studio crashe.
 Pour palier à ce problème, j'ai fait un petit programme en Go qui fait le même travail.
 
+## Répartition des prix
+
+Si on trace la densité des prix, on réalise tout d'abord que les prix sont à valeurs dans l'intervalle $[0;+\infty[$ et d'autre part, par rapport à l'intervalle de prix, cette densité a tendance à s'accumuler sur la gauche de l'intervalle.
+
+![Densite-prix](./notes/densite-prix.png)
+
+Il semble donc judicieux de travailler sur le log des prix. Dans ce cas, la densité de $\log(price)$ est beaucoup plus centrée et ressemble davantage à une gaussienne.
+
+![Densite-prix](./notes/densite-log-prix.png)

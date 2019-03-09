@@ -86,7 +86,6 @@ mat3=melt(mat2, id="id") %>% mutate(variable=as.character(variable)) %>% left_jo
 # filter(mat3,value==min(mat3$value))
 # filter(airbnb,id==9359)$listing_url
 
-
 P04_dist_monuments=filter(mat3, value<=100) %>% group_by(id) %>% summarise(mon_100=n()) %>%
   full_join(filter(mat3, value<=200) %>% group_by(id) %>% summarise(mon_200=n()), by="id") %>%
   full_join(filter(mat3, value<=500) %>% group_by(id) %>% summarise(mon_500=n()), by="id") %>%

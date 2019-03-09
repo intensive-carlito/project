@@ -6,7 +6,6 @@ P09_modele<-readRDS("./R_data/P08_airbnb.rds")
 
 
 #''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
 ggplot (P09_modele,aes(x=price))+
   geom_density(color="darkblue", fill="lightblue") 
 ggplot (P09_modele,aes(x=log(price)))+
@@ -17,7 +16,7 @@ ggplot (P09_modele,aes(x=log(price)))+
 ###### Decomposition echantillon i ###### '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 train <- P09_modele %>% sample_frac(0.8)
-test <- anti_join(P09_modele, train,by="id")
+test <- anti_join(P09_modele, train, by="id")
 
 DiffMod<-matrix(0,nrow=5,ncol=2)
 row.names(DiffMod)<-c("Average IB error","Variance IB error","AIC","Average OB error","Variance OB error")

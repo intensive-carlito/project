@@ -10,6 +10,19 @@ airbnb=readRDS("./R_data/airbnb.RDS")
 # > creation de variables (longueur de la descritpion)
 
 P08_airbnb_shiny = dplyr::select(id, longitude, latitude, )
+
+
+dist_centre <- function(lo, la) {
+  centre_paris <- c(2.3522219, 48.856614)
+  distm(c(l,ll), centre_paris, fun=distVincentyEllipsoid)
+}
+
+centre_paris <- c(2.3522219, 48.856614)
+airbnb <- mutate(airbnb, dist_centre=dist_centre(longitude, latitude))
+
+abnb <- as.data.table(airbnb)
+abnb[, centre_paris:=distm(c(3, 4), c, fun=distVincentyEllipsoid)]
+
 P08_airbnb=dplyr::select(airbnb,
                            id,
                            summary, 
@@ -50,6 +63,7 @@ P08_airbnb=dplyr::select(airbnb,
          cancellation_policy=as.factor(cancellation_policy),
          beds=ifelse(is.na(beds),1,beds),
          bedrooms=ifelse(is.na(bedrooms),1,bedrooms),
+         dist_centre=dist_centre(longitude,latitude),
          bathrooms=ifelse(is.na(bathrooms),1,bathrooms)
   ) %>%
   dplyr::select(-summary) %>%
