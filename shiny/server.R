@@ -51,5 +51,6 @@ function(input, output) {
       #addHeatmap(data = airbnb, intensity=~price, lng=~longitude, lat=~latitude, max=.6, blur = 60)
     
   })
-  
+ 
+  output$price <- renderText(paste0(12, "€"))
 }

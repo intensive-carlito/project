@@ -1,3 +1,4 @@
+library(dplyr)
 airbnb=readRDS("./R_data/airbnb.RDS") %>% head(5000)
 arrondissement <- readRDS("../input/arrondissements.rds")
 

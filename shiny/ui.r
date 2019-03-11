@@ -39,9 +39,16 @@ dashboardPage(
       ),
       tabItem("Autre",
               fluidRow(
+                selectInput("modele", "Modèle :",
+                            c("Régression linéaire" = "model_RStep_2",
+                              "Régression linéaire Poisson" = "model_RLogStep_2")),
                 textInput("inputAd", "Emplacement de l'appartement : ", value = "10 rue de naravin, 75009, paris", width = NULL, placeholder = NULL),
                 tableOutput('table'),
-                includeHTML("www/methodo.html"),
+                numericInput("occupants", "Nombre d'occupants : ", value = 1),
+                  column(4,
+                       includeHTML("www/methodo.html")),
+                  column(4, offset = 1,
+                       h1(textOutput("price"))),
                 leafletOutput("mymap_norm")
               )
       )
