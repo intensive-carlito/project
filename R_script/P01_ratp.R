@@ -1,8 +1,6 @@
 # airbnb
 
 # RATP ------------------------------------------------------------------------------------------
-ratp=fread("C:/temp/projet/accessibilite-des-gares-et-stations-metro-et-rer-ratp.csv",stringsAsFactors=FALSE, encoding = 'UTF-8') %>%
-  filter(floor(CodeINSEE/1000)==75) %>% select(nomptar,coord) %>% unique()
 ratp = ratp %>% separate(coord, c("latitude", "longitude"), sep=",") %>% 
   mutate(longitude= as.numeric(longitude),
          latitude= as.numeric(latitude)) %>%
@@ -10,6 +8,9 @@ ratp = ratp %>% separate(coord, c("latitude", "longitude"), sep=",") %>%
   mutate(variable=as.character(variable))
 mat2 <- as.data.frame(distm(setDT(head(airbnb,1000))[,.(longitude,latitude)], setDT(ratp)[,.(longitude,latitude)], fun=distVincentyEllipsoid)) %>%
   cbind(select(head(airbnb,1000),id))
+ratp <- fread("input/accessibilite-des-gares-et-stations-metro-et-rer-ratp.csv", stringsAsFactors = F, encoding = 'UTF-8') %>%
+  filter(floor(CodeINSEE / 1000) == 75) %>%
+  select(nomptar, coord) %>% unique()
 
 mat3=melt(mat2, id="id") %>% mutate(variable=as.character(variable)) %>% left_join(ratp, by="variable")
 

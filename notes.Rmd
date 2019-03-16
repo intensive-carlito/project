@@ -1,46 +1,66 @@
 ---
 title: "Air BnB à Paris"
-output: beamer_presentation
+output:
+  slidy_presentation: default
+  beamer_presentation: default
+  ioslides_presentation: default
 ---
 
 ---
 
-# La source principale est _inside airbnb_
+# Les données utilisées pour réaliser ce modèle
 
-* `listings.csv` qui contient l'ensemble des appartements (60 000 appartements)
-* `reviews.csv` les revues des clients (1 000 000 de lignes)
-* `accessibilite-des-gares-et-stations-metro-et-rer.csv` Les stations 400 stations de métro avec leurs positions.
-* `quartiers.rds` : Paris est découpé en 80 quartiers, plus précis que les arrondissements.
+* Le site `http://insideairbnb.com/` est la base de nos données. On a pu ainsi récupérer le fichier `listings.csv` contenant les appartements mis en location sur Air BNB à Paris (60 000 appartements)
 
-* Monuments de Paris sur la base Mérimée (2000 données)
-* timeout.fr les cents meilleurs bars de Paris. On peut y faire du scrapping pour récupérer les adresses grace à adresse.data.gouv.fr on peut récupérer les coordonnées GPS.
+* Nous avons nettoyé ce tableau :
+  * Filtrage sur le code postal afin de n'avoir que du 75 ; vérification du code postal afin qu'il n'ait que 5 chiffres
+  * Conversions de certaines valeurs avec renommage des champs si nécessaire.
+  * Conversion des données de date en date au sens R.
+  * Les appartements dont les prix ne sont pas fournis sont supprimés.
+  * Ajout d'une colonne avec des intervalles de prix, considérés comme facteurs, ça peut être utile par la suite.
 
 ---
+
+* Nous nous sommes aussi procuré la liste des monuments historiques. Cette liste est dans un fichier `merimee-MH-valid.csv`.
+* A partir de ces infos, nous avons créé un dataframe _monuments_ dans lequel nous n'avons gardé que les monuments de Paris (département 75).
+
+---
+
+* Une autre source de données est le fichier `accessibilite-des-gares-et-stations-metro-et-rer-ratp.csv` récupéré sur `https://www.data.gouv.fr/en/datasets/accessibilite-des-gares-et-stations-de-metro-et-rer-ratp-1/`.
+* Les retraitements de ce fichier consistent en :
+  * Ne garder que les adresses du département 75.
+  * Supprimer les doublons
+  * Séparer la longitude et la latitude en deux colonnes distinctes.
+  
+---
+
+* Nous avons aussi récupéré le fichier `reviews.csv` contenant les revues des clients (1 000 000 de lignes).
+* Nous avons construit les fichiers :
+  * `accessibilite-des-gares-et-stations-metro-et-rer.csv` contenant les 400 stations de métro parisiennes avec leurs positions.
+  * `quartiers.rds` donnant  Paris et ses 80 quartiers, plus précis que les arrondissements.
+  * `Monuments de Paris` à partir de la base Mérimée (2000 données).
+* Enfin le site `timeout.fr` peut nous permettre de récupérer les cent meilleurs bars de Paris.
+
 
 # Fabrication des quartiers
 
-Nous utilisons https://opendata.paris.fr/explore/dataset/quartier_paris/export/
+* Nous avons pu télécharger les quartiers de Paris sur le site https://opendata.paris.fr/explore/dataset/quartier_paris/export/.
+* Nous avons exporté les id, latitudes, longitudes des différentes locations au format csv.
 
-pour télécharger les quartiers de Paris.
+* Ces deux sources ont été importées dans le logiciel QGIS. Son outil d'intersection nous a alors permis de déterminer à quels quartiers appartiennent chacune des locations.
+* Après cette opération, nous avons exporté le résultat dans le fichier `quartiers.csv`.
 
-Nous avons exporté les id, latitudes, longitudes des différentes locations au format csv.
+![QGIS](./images/qgis.png){width=500px}
 
-Ces deux sources ont été importées dans QGIS. L'outil d'intersection nous a alors permis de déterminer à quels quartiers appartiennent chacune des locations.
-Après cette opération, nous avons exporté le résultat dans le fichier `quartiers.csv`.
-
-![QGIS](./images/qgis.png)
+---
 
 # Récupération des monuments
 
 Un peu de scrapbooking sur le site http://monumentsdeparis.net/ permet de récupérer les monuments parisiens ainsi que leurs adresses.
 Une seconde étape est d'utiliser à nouveau adresse.data.gouv.fr pour récupérer les adresses dans un format harmonisé et les longitudes/latitudes.
 
-Ensuite, pour chaque logement, on compte combien de monuments sont à moins de 100, 200m, 500m et 1km.
-Le résultat est stocké dans la table `P04_dist_monuments`.
-
-## Remarques
-
-* distances au centre
+Ensuite, pour chaque logement, on compte combien de monuments sont à moins de 100m, 200m, 500m et 1km.
+Le script faisant ce travail est `P04_monuments.R`. Le résultat est stocké dans la table `P04_dist_monuments`.
 
 # Premiers essais
 
