@@ -52,3 +52,11 @@ monuments=fread("./input/merimee-MH-valid.csv",stringsAsFactors=FALSE, encoding 
 # 
 saveRDS(airbnb,"./R_data/airbnb.RDS")
 # # airbnb=readRDS("./R_data/airbnb.RDS")
+
+# données de quartiers 
+library(rgdal)
+crswgs84=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+cities <- readOGR(dsn="./input/QUARTIER/QUARTIER.shp",layer = "QUARTIER")
+plot(cities)
+quartier <- spTransform(cities, crswgs84)
+saveRDS(quartier,"./input/quartiers.rds")

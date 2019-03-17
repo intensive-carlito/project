@@ -14,10 +14,10 @@ function(input, output) {
     
     tmp <- leaflet() %>%
       addProviderTiles(providers$Esri,options = providerTileOptions(noWrap = TRUE)) %>%
-      addMarkers(data = airbnb,~longitude, ~latitude, popup = ~as.character(price), label = ~as.character(name),clusterOptions = markerClusterOptions()) %>%
+      addMarkers(data = airbnb,~longitude, ~latitude, popup = ~as.character(price), label = ~as.character(price),clusterOptions = markerClusterOptions()) %>%
       addPolygons(data = arrondissement, stroke = TRUE, smoothFactor = 0.2, fillOpacity = 0.01)
     if (input$heatMapCheckBox) {
-        tmp %>% addHeatmap(data = airbnb, intensity=~guests_included, lng=~longitude, lat=~latitude, min=~input$heatMapSlider[1], max=~input$heatMapSlider[2], blur = 60)
+        tmp %>% addHeatmap(data = airbnb, intensity=~price, lng=~longitude, lat=~latitude, min=~input$heatMapSlider[1], max=~input$heatMapSlider[2], blur = 60)
     }
     else {
       tmp
@@ -29,9 +29,9 @@ function(input, output) {
     ad=as.data.frame(content(normalise)$features[[1]])
     if (dim(ad)[2] >= 2) {
       colnames(ad)[c(1,2)] <- c("longitude","latitude")
-      temp=select(sample_frac(airbnb,0.1), latitude, longitude, neighbourhood_cleansed)
+      temp=dplyr::select(sample_frac(airbnb,0.1), latitude, longitude, neighbourhood_cleansed,l_qu)
       mat2 <- as.data.frame(distm(setDT(temp)[,.(longitude,latitude)], setDT(ad)[,.(longitude,latitude)], fun=distVincentyEllipsoid))%>%
-        cbind(select(temp,neighbourhood_cleansed)) %>% arrange(V1) %>% head(1) %>% select(neighbourhood_cleansed)
+        cbind(dplyr::select(temp,neighbourhood_cleansed,l_qu)) %>% arrange(V1) %>% head(1) %>% dplyr::select(neighbourhood_cleansed,l_qu)
       ad = cbind(ad,mat2)
     }
     else {
@@ -40,7 +40,12 @@ function(input, output) {
     ad
   })
   
-  output$table <- renderTable(select(Table_normalisation(),properties.label,properties.type,longitude,latitude,neighbourhood_cleansed))
+  output$table <- renderTable(dplyr::select(Table_normalisation(),
+                                            Adresse_normalisee=properties.label,
+                                            precision_de_la_normalisation=properties.type,
+                                            longitude,latitude,
+                                            Quartier_bdd_Airbnb=neighbourhood_cleansed,
+                                            sous_quartier=l_qu))
 
   output$mymap_norm <- renderLeaflet({
     

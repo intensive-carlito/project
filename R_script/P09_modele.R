@@ -1,59 +1,57 @@
 library("randomForest")
-# airbnb=readRDS("../R_data/airbnb.RDS")
-# P01_dist_RATP=readRDS("./R_data/P01_dist_RATP.RDS")
-airbnb2=head(airbnb,100)
+library("caret")
+###### Importation data ###### ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+P09_modele<-readRDS("./R_data/P08_airbnb.rds")
+sapply(P09_modele, function(y) sum(length(which(is.nan(y)))))
 
-P09_modele = select(airbnb,
-                    id,
-                    summary, 
-                    # host_name, 
-                    host_since, 
-                    # host_location, 
-                    host_response_time, 
-                    host_response_rate,
-                    host_is_superhost,
-                    host_total_listings_count,
-                    neighbourhood_cleansed,
-                    zipcode,
-                    property_type,
-                    room_type,
-                    accommodates,
-                    bathrooms,
-                    bedrooms,
-                    # beds,
-                    bed_type,
-                    #square_feet,
-                    security_deposit,
-                    guests_included,
-                    minimum_nights,
-                    number_of_reviews,
-                    review_scores_rating,
-                    cancellation_policy,
-                    price) %>% 
-  # mutate(host_location_ind=(host_location %like% "Paris"))
-  mutate(host_location_ind=grepl("\\b(?i)paris\\b",host_location),
-         bedrooms=ifelse(is.na(bedrooms),0,bedrooms),
-         security_deposit=ifelse(is.na(security_deposit),0,security_deposit),
-         bathrooms=ifelse(is.na(bathrooms),1,bathrooms),
-         host_total_listings_count=ifelse(is.na(host_total_listings_count),1,host_total_listings_count),
-         review_scores_rating=ifelse(is.na(review_scores_rating),90,review_scores_rating))
-
-
-train <- P09_modele %>% sample_frac(0.8)
+set.seed(1234)
+trainIndex <- createDataPartition(P09_modele$id, p = .8,list = FALSE,times = 1)
+train <- P09_modele[trainIndex,]
 test <- anti_join(P09_modele, train,by="id")
 
-model <- randomForest(price ~ summary                  +host_name                +host_since               +host_location            +
-                        host_response_time       +host_response_rate       +host_is_superhost        +host_total_listings_count+
-                        neighbourhood_cleansed   +zipcode                  +property_type            +room_type                +
-                        accommodates             +bathrooms                +bedrooms                 +bed_type                 +
-                        security_deposit         +guests_included          +minimum_nights           +number_of_reviews        +
-                        review_scores_rating     +cancellation_policy      +price                    +host_location_ind, 
-                      data = train, ntree = 500, na.action = na.omit)
-sapply(train, function(y) sum(length(which(is.nan(y)))))
+model <- randomForest(price ~ bedrooms + delai_inscription + summary_l + zipcode + l_qu + bathrooms + host_total_listings_count , 
+                      data = train, ntree = 100, na.action = na.omit)
+# bedrooms + delai_inscription + summary_l + zipcode + l_qu + bathrooms + host_total_listings_count
+
+varImpPlot(model)
+
+test$predicted <- predict(model, test)
+Metrics::rmse(test$price,test$predicted)
 
 
 
-mean(airbnb$review_scores_rating,na.rm=T)
-View(filter(airbnb, id==36490))
-filter(airbnb, id==36490)$picture_url
-View(table(airbnb$bed_type))
+# write.csv(P09_modele,"C:/temp/P09_modele.csv", quote = F, row.names = F)
+control <- trainControl(method="repeatedcv", number=5, repeats=1)
+rf_grid <- expand.grid(mtry = c(2, 3, 4, 5),
+                       splitrule = c("gini"),
+                       min.node.size = c(1, 3, 5))
+rf_grid
+
+rf_fit <- train(price ~ bedrooms + delai_inscription + summary_l + zipcode + l_qu + bathrooms + host_total_listings_count , 
+                data = train, trControl=control, 
+                method = "rf",                
+                tuneGrid = rf_grid)
+rf_fit
+
+control <- trainControl(method="repeatedcv", number=5, repeats=1)
+metric <- "RMSE"
+set.seed(7)
+mtry <- sqrt(ncol(train))
+tunegrid <- expand.grid(.mtry=6)
+rf_default <- train(price~bedrooms + delai_inscription + summary_l + zipcode + l_qu + bathrooms + host_total_listings_count , 
+                    data=train, method="rf", metric=metric, tuneGrid=tunegrid, trControl=control)
+print(rf_default)
+# Random Forest 
+# 
+# 5740 samples
+# 7 predictor
+# 
+# No pre-processing
+# Resampling: Cross-Validated (5 fold, repeated 1 times) 
+# Summary of sample sizes: 4591, 4592, 4592, 4594, 4591 
+# Resampling results:
+#   
+#   RMSE      Rsquared   MAE     
+# 44.62674  0.5027252  30.42737
+# 
+# Tuning parameter 'mtry' was held constant at a value of 6

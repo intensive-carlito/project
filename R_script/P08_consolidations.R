@@ -9,19 +9,19 @@ airbnb=readRDS("./R_data/airbnb.RDS")
 # > ajout des valeurs externes (distances des métros, monuments et quartiers plus précis) 
 # > creation de variables (longueur de la descritpion)
 
-P08_airbnb_shiny = dplyr::select(id, longitude, latitude, )
+# P08_airbnb_shiny = dplyr::select(id, longitude, latitude, )
 
 
-dist_centre <- function(lo, la) {
-  centre_paris <- c(2.3522219, 48.856614)
-  distm(c(l,ll), centre_paris, fun=distVincentyEllipsoid)
-}
-
-centre_paris <- c(2.3522219, 48.856614)
-airbnb <- mutate(airbnb, dist_centre=dist_centre(longitude, latitude))
-
-abnb <- as.data.table(airbnb)
-abnb[, centre_paris:=distm(c(3, 4), c, fun=distVincentyEllipsoid)]
+# dist_centre <- function(lo, la) {
+#   centre_paris <- c(2.3522219, 48.856614)
+#   distm(c(lo, la), centre_paris, fun=distVincentyEllipsoid)
+# }
+# 
+# centre_paris <- c(2.3522219, 48.856614)
+# airbnb <- mutate(airbnb, dist_centre=dist_centre(longitude, latitude))
+# 
+# abnb <- as.data.table(airbnb)
+# abnb[, centre_paris:=distm(c(3, 4), c, fun=distVincentyEllipsoid)]
 
 P08_airbnb=dplyr::select(airbnb,
                            id,
@@ -44,7 +44,7 @@ P08_airbnb=dplyr::select(airbnb,
                            number_of_reviews,
                            review_scores_rating,
                            cancellation_policy,
-                           beds,
+                           beds,amenities,
                            price) %>%
   mutate(delai_inscription=as.Date("2019-01-01")-host_since,
          summary_l=nchar(summary),
@@ -63,7 +63,7 @@ P08_airbnb=dplyr::select(airbnb,
          cancellation_policy=as.factor(cancellation_policy),
          beds=ifelse(is.na(beds),1,beds),
          bedrooms=ifelse(is.na(bedrooms),1,bedrooms),
-         dist_centre=dist_centre(longitude,latitude),
+         # dist_centre=dist_centre(longitude,latitude),
          bathrooms=ifelse(is.na(bathrooms),1,bathrooms)
   ) %>%
   dplyr::select(-summary) %>%
@@ -71,10 +71,27 @@ P08_airbnb=dplyr::select(airbnb,
 
   left_join(quartiers, by="id") %>%
   left_join(P01_dist_RATP, by="id") %>%
-  left_join(select(P04_dist_monuments,id,mon_100=n_100,mon_200=n_200,mon_500=n_500,mon_1000=n_1000), by="id") %>%
-  arrange(id) %>% filter(!is.na(l_qu)) %>%
-  mutate(l_qu=as.factor(l_qu)
-)
+  left_join(dplyr::select(P04_dist_monuments,id,mon_100=n_100,mon_200=n_200,mon_500=n_500,mon_1000=n_1000), by="id") %>%
+  arrange(id) %>% filter(!is.na(l_qu)) %>% 
+  mutate(l_qu= ifelse(l_qu %in% c("Gaillon","Vivienne", "Place-VendÃ´me","Palais-Royal"),"Gaillon-Vivienne",l_qu),
+         l_qu= ifelse(l_qu %in% c("Mail"),"Bonne-nouvelle",l_qu),
+         l_qu= ifelse(l_qu %in% c("Odeon","Saint-Germain-des-PrÃ©s","Monnaie","Saint-Thomas-d'Aquin","St-Germain-l'Auxerrois"),"Odéon",l_qu),
+         l_qu= ifelse(l_qu %in% c("ChaussÃ©e-d'Antin","Europe","Plaine de Monceaux"),"Saint-Georges",l_qu),
+         l_qu= ifelse(l_qu %in% c("Ecole-Militaire","Invalides","Madeleine","Champs-ElysÃ©es","Faubourg-du-Roule"),"Champs-ElysÃ©es",l_qu),
+         l_qu= ifelse(l_qu %in% c("Bercy","Bel-Air","Arsenal"),"Picpus",l_qu),
+         l_qu= ifelse(l_qu %in% c("Faubourg-Montmartre", "La Chapelle","Pont-de-Flandre"),"Villette",l_qu),
+         l_qu= ifelse(l_qu %in% c("Croulebarbe", "Montparnasse","Val-de-Grace"),"Montparnasse",l_qu),
+         l_qu= ifelse(l_qu %in% c("Parc-de-Montsouris"),"Maison-Blanche",l_qu),
+         l_qu= ifelse(l_qu %in% c("Sorbonne","Saint-Victor","Notre-Dame","Jardin-des-Plantes","Val-de-Grace","SalpÃªtriÃ¨re"),"Jardin-des-Plantes",l_qu)) %>%
+  mutate(l_qu=as.factor(l_qu)) %>%
+  mutate(amenities=gsub("\\{|\\}","",amenities)) %>% mutate(nb_amen=str_count(amenities, ',')) 
+
+
+# amen= as.data.frame(stringr::str_split_fixed(toto$amenities, ',',max(str_count(toto$amenities, ',')))) 
+# amen= cbind(amen,select(airbnb, id))
+# amen_d = reshape2::melt(amen, id.vars="id") %>% filter(value != "")
+# amen_d_f=as.data.frame(table(amen_d$value))
+# amen_d_f = arrange(amen_d_f,-Freq) %>% head(60)
   
 # Retrait données extremes
 Quant98 <- quantile(P08_airbnb$price,0.98)
@@ -86,3 +103,5 @@ sapply(P08_airbnb, function(y) sum(length(which(is.na(y)))))
 
 P08_airbnb[is.na(P08_airbnb)] <- 0
 saveRDS(P08_airbnb, "./R_data/P08_airbnb.rds")
+airbnb_shiny=select(airbnb,id,longitude,latitude,neighbourhood_cleansed,price) %>% inner_join(select(P09_modele, id, l_qu), by="id")
+saveRDS(airbnb_shiny, "./R_data/airbnb_shiny.rds")
