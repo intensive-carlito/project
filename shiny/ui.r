@@ -31,7 +31,9 @@ dashboardPage(skin = "red",
     tabItems(
       tabItem("carto",
               fluidRow(
-                valueBoxOutput("nb_appart"),
+                valueBoxOutput("nb_appart")
+                ),
+              fluidRow(
                 box(checkboxInput("heatMapCheckBox", "Prix par zone"),
                     conditionalPanel( condition = "input.heatMapCheckBox==true",
                                       sliderInput("heatMapSlider", label = "Slider Range", min = 0, max = 1, value = c(1), step = 0.02))
@@ -49,14 +51,16 @@ dashboardPage(skin = "red",
                   collapsible = TRUE,
                   textInput("inputAd", "Emplacement de l'appartement : ", value = "10 rue de naravin, 75009, paris", width = NULL, placeholder = NULL),
                   tableOutput('table'),
-                  leafletOutput("mymap_norm")
+                  leafletOutput("mymap_norm"),
+                  dataTableOutput('table_3_plus_proche')
                 ),
                 box(                 
                   title = "Description", status = "primary", solidHeader = TRUE,
                   collapsible = TRUE,
                   sliderInput("bedrooms", "Nombre de lits dans l'appartements : ",min = 0, max = 10, value = c(1), step = 1),
                   sliderInput("bathrooms", "Nombre de salle de bains dans l'appartements : ",min = 0, max = 10, value = c(1), step = 1),
-                  textInput("summary", label="Faites une description de l'appartement", value = " ")
+                  textInput("summary", label="Faites une description de l'appartement", value = " "),
+                  tags$img(src ="english.png"),tags$img(src ="french.png")
                 ),
                 checkboxInput("AlreadyCheckBox", "Avez vous déjà un compte AirBnb ?"),
                 conditionalPanel( condition = "input.AlreadyCheckBox==true",
