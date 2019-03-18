@@ -67,6 +67,21 @@ function(input, output) {
       #addHeatmap(data = airbnb, intensity=~price, lng=~longitude, lat=~latitude, max=.6, blur = 60)
     
   })
+  
+  
+  price_ml <- reactive({
+    test2=(data.frame(l_qu=head(Table_normalisation(),1)$l_qu,
+                      zipcode=as.character(head(Table_normalisation(),1)$properties.postcode),
+                      bedrooms=input$bedrooms,
+                      bathrooms=input$bathrooms,
+                      summary_l=length(input$summary),
+                      delai_inscription=difftime(as.Date("2019-01-01"),input$delai_inscription,tz="Europe/Paris","days"),
+                      host_total_listings_count=0L, stringsAsFactors = F)) %>%
+      mutate(l_qu=factor(l_qu,levels=levels(airbnb$l_qu)),
+             zipcode=factor(zipcode,levels=levels(airbnb$zipcode)))
+    predicted <- round(predict(model, test2),0)
+  })
+  
  
-  output$price <- renderText(paste0(12, "€"))
+  output$price <- renderText(price_ml())
 }

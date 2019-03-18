@@ -5,12 +5,12 @@ P09_modele<-readRDS("./R_data/P08_airbnb.rds")
 sapply(P09_modele, function(y) sum(length(which(is.nan(y)))))
 
 set.seed(1234)
-trainIndex <- createDataPartition(P09_modele$id, p = .8,list = FALSE,times = 1)
+trainIndex <- createDataPartition(P09_modele$id, p = .5,list = FALSE,times = 1)
 train <- P09_modele[trainIndex,]
 test <- anti_join(P09_modele, train,by="id")
 
 model <- randomForest(price ~ bedrooms + delai_inscription + summary_l + zipcode + l_qu + bathrooms + host_total_listings_count , 
-                      data = train, ntree = 100, na.action = na.omit)
+                      data = train, ntree = 100, na.action = na.omit, mtry=6)
 # bedrooms + delai_inscription + summary_l + zipcode + l_qu + bathrooms + host_total_listings_count
 
 varImpPlot(model)
@@ -18,7 +18,20 @@ varImpPlot(model)
 test$predicted <- predict(model, test)
 Metrics::rmse(test$price,test$predicted)
 
+saveRDS(model,"./R_data/model_.rds")
+test2=(data.frame(l_qu="Saint-Georges",
+                  zipcode="75009",
+                  bedrooms=1,
+                  bathrooms=1,
+                  summary_l=100L,
+                  delai_inscription=difftime(Sys.time(),Sys.time(),tz="Europe/Paris","days"),
+                  host_total_listings_count=0L, stringsAsFactors = F)) %>%
+  mutate(l_qu=factor(l_qu,levels=levels(P09_modele$l_qu)),
+         zipcode=factor(zipcode,levels=levels(P09_modele$zipcode)))
+test2$predicted <- predict(model, test2)
 
+str(select(test,l_qu,zipcode,bedrooms,bathrooms,summary_l,delai_inscription,host_total_listings_count))
+str(test2)
 
 # write.csv(P09_modele,"C:/temp/P09_modele.csv", quote = F, row.names = F)
 control <- trainControl(method="repeatedcv", number=5, repeats=1)

@@ -49,7 +49,7 @@ dashboardPage(skin = "red",
                 box(
                   title = "Adresse de l appartement", status = "primary", solidHeader = TRUE,
                   collapsible = TRUE,
-                  textInput("inputAd", "Emplacement de l'appartement : ", value = "10 rue de naravin, 75009, paris", width = NULL, placeholder = NULL),
+                  textInput("inputAd", "Emplacement de l'appartement : ", value = "10 rue de naravin, 75009, paris"),
                   tableOutput('table'),
                   leafletOutput("mymap_norm"),
                   dataTableOutput('table_3_plus_proche')
@@ -59,7 +59,7 @@ dashboardPage(skin = "red",
                   collapsible = TRUE,
                   sliderInput("bedrooms", "Nombre de lits dans l'appartements : ",min = 0, max = 10, value = c(1), step = 1),
                   sliderInput("bathrooms", "Nombre de salle de bains dans l'appartements : ",min = 0, max = 10, value = c(1), step = 1),
-                  textInput("summary", label="Faites une description de l'appartement", value = " "),
+                  textAreaInput("summary", label="Faites une description de l'appartement", value = "Décrivez ici votre appartement, l'emplacement, la proximité des métros, etc. Plus c'est long et plus vous pourrez louer votre appartement cher ! (mais chut !)", height = "300px"),
                   tags$img(src ="english.png"),tags$img(src ="french.png")
                 ),
                 checkboxInput("AlreadyCheckBox", "Avez vous déjà un compte AirBnb ?"),
@@ -71,10 +71,12 @@ dashboardPage(skin = "red",
                                               startview = 'year'),
                                     numericInput("host_total_listings_count", label="Combien avez vous eu de visiteurs ?", value = 1,min=1,step	=1)
                                   )),
-                column(4,
-                       includeHTML("www/methodo.html")),
-                column(4, offset = 1,
-                       h1(textOutput("price")))
+                box( 
+                  includeHTML("www/methodo.html")
+                     ),
+                box(title = "Prix de la prédiction de l'appartement", status = "primary", solidHeader = TRUE,
+                    collapsible = FALSE,
+                    textOutput("price"))
               )
       )
     )

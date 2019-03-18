@@ -103,5 +103,6 @@ sapply(P08_airbnb, function(y) sum(length(which(is.na(y)))))
 
 P08_airbnb[is.na(P08_airbnb)] <- 0
 saveRDS(P08_airbnb, "./R_data/P08_airbnb.rds")
-airbnb_shiny=select(airbnb,id,longitude,latitude,neighbourhood_cleansed,price, picture_url) %>% inner_join(select(P09_modele, id, l_qu), by="id")
+airbnb_shiny=select(airbnb,id,longitude,latitude,neighbourhood_cleansed,price, picture_url) %>% inner_join(select(P09_modele, id, l_qu,zipcode), by="id")
 saveRDS(airbnb_shiny, "./R_data/airbnb_shiny.rds")
+saveRDS(airbnb_shiny, "./shiny//R_data/airbnb_shiny.rds")
