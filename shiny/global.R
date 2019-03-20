@@ -7,4 +7,4 @@ modelRF <- readRDS("../shiny/R_data/model_.rds")
 
 # saveRDS(arrondissement,"D:/Formation Data Scientist Ensae/04 - Projet/project-ds/input/arrondissements.rds")
 
-modelXGB <- readRDS("../shiny/R_data/model_xgb_10perc.rds")
+# modelXGB <- readRDS("../shiny/R_data/model_xgb_10perc.rds")

@@ -1,3 +1,4 @@
+library("caret")
 P01_dist_RATP=readRDS("./R_data/P01_dist_RATP.RDS")
 P04_dist_monuments=readRDS("./R_data/P04_dist_monuments.RDS")
 quartiers=readRDS("./R_data/quartiers.rds")
@@ -84,7 +85,8 @@ P08_airbnb=dplyr::select(airbnb,
          l_qu= ifelse(l_qu %in% c("Parc-de-Montsouris"),"Maison-Blanche",l_qu),
          l_qu= ifelse(l_qu %in% c("Sorbonne","Saint-Victor","Notre-Dame","Jardin-des-Plantes","Val-de-Grace","SalpÃªtriÃ¨re"),"Jardin-des-Plantes",l_qu)) %>%
   mutate(l_qu=as.factor(l_qu)) %>%
-  mutate(amenities=gsub("\\{|\\}","",amenities)) %>% mutate(nb_amen=str_count(amenities, ',')) 
+  mutate(amenities=gsub("\\{|\\}","",amenities)) %>% mutate(nb_amen=str_count(amenities, ',')) %>%
+  mutate(delai_inscription=as.numeric(delai_inscription))
 
 
 # amen= as.data.frame(stringr::str_split_fixed(toto$amenities, ',',max(str_count(toto$amenities, ',')))) 
@@ -101,12 +103,35 @@ source(file = "./R_script/P08_RegroupFact.R")
 Quant98 <- quantile(P08_airbnb$price,0.98)
 P08_airbnb <- P08_airbnb %>% filter(price<=Quant98)  # temporaire pour test rapide de modele
 
-library(naniar)
-vis_miss(sample_frac(P08_airbnb,0.1))
+# library(naniar)
+# vis_miss(sample_frac(P08_airbnb,0.1))
 sapply(P08_airbnb, function(y) sum(length(which(is.na(y)))))
 
 P08_airbnb[is.na(P08_airbnb)] <- 0
+P08_airbnb = select(P08_airbnb,id,price,
+                    #quartier
+                    l_qu,
+                    zipcode,
+                    #appart
+                    bedrooms,
+                    bathrooms,
+                    accommodates,
+                    nb_amen,
+                    summary_l,
+                    #inscription Airbnb
+                    delai_inscription,
+                    host_total_listings_count)
+
 saveRDS(P08_airbnb, "./R_data/P08_airbnb.rds")
+
+set.seed(1234)
+Id_train <- createDataPartition(P08_airbnb$price,1,p=0.8,list=FALSE)
+P08_airbnb_train <- P08_airbnb[Id_train,]
+P08_airbnb_test <- P08_airbnb[-Id_train,]
+saveRDS(P08_airbnb_train, "./R_data/P08_airbnb_train.rds")
+saveRDS(P08_airbnb_test, "./R_data/P08_airbnb_test.rds")
+
+
 airbnb_shiny=select(airbnb,id,longitude,latitude,neighbourhood_cleansed,price, picture_url) %>% inner_join(select(P09_modele, id, l_qu,zipcode), by="id")
 saveRDS(airbnb_shiny, "./R_data/airbnb_shiny.rds")
 saveRDS(airbnb_shiny, "./shiny//R_data/airbnb_shiny.rds")
