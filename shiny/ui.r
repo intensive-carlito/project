@@ -23,7 +23,8 @@ dashboardPage(skin = "red",
               dashboardSidebar(
                 sidebarMenu(
                   menuItem("Visualisation / Carto", tabName = "carto"),
-                  menuItem("Prédiction", tabName = "Autre")
+                  menuItem("Prédiction", tabName = "Autre"),
+                  menuItem("Méthodologie", tabName = "methodo")
                 )
               ),
               
@@ -75,7 +76,9 @@ dashboardPage(skin = "red",
                             column(4, offset = 1,
                                    h1(textOutput("price")))
                           )
-                  )
+                  ), 
+                  tabItem("methodo",
+                          a("test",href="~/www/notes.html"))
                 )
               )
 )
