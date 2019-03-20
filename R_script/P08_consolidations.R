@@ -68,7 +68,7 @@ P08_airbnb=dplyr::select(airbnb,
   ) %>%
   dplyr::select(-summary) %>%
   dplyr::filter(!is.na(host_since)) %>%
-
+  
   left_join(quartiers, by="id") %>%
   left_join(P01_dist_RATP, by="id") %>%
   left_join(dplyr::select(P04_dist_monuments,id,mon_100=n_100,mon_200=n_200,mon_500=n_500,mon_1000=n_1000), by="id") %>%
@@ -92,7 +92,11 @@ P08_airbnb=dplyr::select(airbnb,
 # amen_d = reshape2::melt(amen, id.vars="id") %>% filter(value != "")
 # amen_d_f=as.data.frame(table(amen_d$value))
 # amen_d_f = arrange(amen_d_f,-Freq) %>% head(60)
-  
+
+#### Autres variables qualitatives: regroupement de facteurs '''''''''''''''''''''''''''
+source(file = "./R_script/P08_RegroupFact.R")
+#### '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 # Retrait données extremes
 Quant98 <- quantile(P08_airbnb$price,0.98)
 P08_airbnb <- P08_airbnb %>% filter(price<=Quant98)  # temporaire pour test rapide de modele
