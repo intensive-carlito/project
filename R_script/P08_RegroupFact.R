@@ -10,15 +10,15 @@ var_qual <- c("host_response_time",
               "l_qu"
               )
 
-### host_response_time ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-N_HRT <- P08_airbnb %>% select(host_response_time) %>%
-  group_by(host_response_time) %>%
-  summarise (Ndata =n() ) %>%
-  arrange(Ndata)
+# ### host_response_time ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+# N_HRT <- P08_airbnb %>% dplyr::select(host_response_time) %>%
+#   group_by(host_response_time) %>%
+#   summarise (Ndata =n() ) %>%
+#   arrange(Ndata)
 # Pas de facteur à faible nombre: min à 1052
 
 ### property_type '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-N_ProT <- P08_airbnb %>% select(property_type,price) %>%
+N_ProT <- P08_airbnb %>% dplyr::select(property_type,price) %>%
   group_by(property_type) %>%
   summarise (Ndata =n(),Min=min(price),Median=median(price),Max=max(price)) %>%
   arrange(Ndata)
@@ -51,14 +51,14 @@ P08_airbnb$property_type <- as.factor(P08_airbnb$property_type)
 # P08_airbnb = P08_airbnb %>% mutate(property_type = ifelse(property_type %in% c("Villa",""),"House", property_type))
 
 ### room_type '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-N_RoomT <- P08_airbnb %>% select(room_type) %>%
+N_RoomT <- P08_airbnb %>% dplyr::select(room_type) %>%
   group_by(room_type) %>%
   summarise (Ndata =n() ) %>%
   arrange(Ndata)
 # minim à 443 (shared room) -> acceptable
 
 ### bed_type' ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-N_BedT <- P08_airbnb %>% select(bed_type) %>%
+N_BedT <- P08_airbnb %>% dplyr::select(bed_type) %>%
   group_by(bed_type) %>%
   summarise (Ndata =n() ) %>%
   arrange(Ndata)
@@ -69,7 +69,7 @@ P08_airbnb$bed_type <- gsub("Couch","Not bed",P08_airbnb$bed_type) # canape (pas
 P08_airbnb$bed_type <- as.factor(P08_airbnb$bed_type)
 
 ### cancellation_policy ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-N_CanP <- P08_airbnb %>% select(cancellation_policy) %>%
+N_CanP <- P08_airbnb %>% dplyr::select(cancellation_policy) %>%
   group_by(cancellation_policy) %>%
   summarise (Ndata =n() ) %>%
   arrange(Ndata)
@@ -80,7 +80,7 @@ P08_airbnb$cancellation_policy <- gsub("strict_14_with_grace_period","strict",P0
 P08_airbnb$cancellation_policy <- as.factor(P08_airbnb$cancellation_policy)
 
 ### l_qu ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-N_l_qu <- P08_airbnb %>% select(l_qu) %>%
+N_l_qu <- P08_airbnb %>% dplyr::select(l_qu) %>%
   group_by(l_qu) %>%
   summarise (Ndata =n() ) %>%
   arrange(Ndata)

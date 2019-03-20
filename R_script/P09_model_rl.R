@@ -14,45 +14,47 @@ library("dplyr")
 library("plotly")
 
 ###### Importation data ###### ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-P09_modele<-readRDS("./R_data/P08_airbnb.rds")
+train<-readRDS("./R_data/P08_airbnb_train.rds") %>% head(1000)
+test<-readRDS("./R_data/P08_airbnb_test.rds")
 
 #''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 ###### Retrait de certaines variables (pour espace stockage) ''''''''''''''''''''''
-P09_modele <- P09_modele %>% dplyr::select(-amenities,-id)
+train <- train %>% dplyr::select(-id)
+test <- test %>% dplyr::select(-id)
 
 ###### Visualisation data ###### ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-# summary(P09_modele)
-# str(P09_modele)
-nrow(P09_modele)
-ggplot (P09_modele,aes(x=price))+
-  geom_density(color="darkblue", fill="lightblue") # s'apparente à une loi log normal => passage au log
-ggplot (P09_modele,aes(x=log(price)))+
-  geom_density(color="darkblue", fill="lightblue") 
-
-#''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-###### Fitting d'une loi ###### ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-PriceV<- P09_modele$price
-PriceV[PriceV==0] <- 1 # Prix minim de 1 dollard pour loi log normal
-# Loi normal
-fit_Norm  <- fitdist(PriceV, "norm")
-# Loi log normal => il faut que les Prix soit >0 
-fit_LogNorm  <- fitdist(PriceV, "lnorm")
-# Loi gamma 
-fit_Gam  <- fitdist(PriceV, "gamma")
-# Loi weibull 
-fit_Wei  <- fitdist(PriceV, "weibull")
-
-# Erreur de fitting
-fit_LogNorm$
-
-par(mfrow=c(2,2))
-plot.legend <- c("Normal", "lognormal", "gamma","Weibull")
-denscomp(list(fit_Norm,fit_LogNorm , fit_Gam, fit_Wei), legendtext = plot.legend)
-cdfcomp (list(fit_Norm,fit_LogNorm , fit_Gam, fit_Wei), legendtext = plot.legend)
-qqcomp  (list(fit_Norm,fit_LogNorm , fit_Gam, fit_Wei), legendtext = plot.legend)
-ppcomp  (list(fit_Norm,fit_LogNorm , fit_Gam, fit_Wei), legendtext = plot.legend)
+#' # summary(P09_modele)
+#' # str(P09_modele)
+#' nrow(P09_modele)
+#' ggplot (P09_modele,aes(x=price))+
+#'   geom_density(color="darkblue", fill="lightblue") # s'apparente à une loi log normal => passage au log
+#' ggplot (P09_modele,aes(x=log(price)))+
+#'   geom_density(color="darkblue", fill="lightblue") 
+#' 
+#' #''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+# 
+# ###### Fitting d'une loi ###### ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+# PriceV<- P09_modele$price
+# PriceV[PriceV==0] <- 1 # Prix minim de 1 dollard pour loi log normal
+# # Loi normal
+# fit_Norm  <- fitdist(PriceV, "norm")
+# # Loi log normal => il faut que les Prix soit >0 
+# fit_LogNorm  <- fitdist(PriceV, "lnorm")
+# # Loi gamma 
+# fit_Gam  <- fitdist(PriceV, "gamma")
+# # Loi weibull 
+# fit_Wei  <- fitdist(PriceV, "weibull")
+# 
+# # Erreur de fitting
+# fit_LogNorm$
+# 
+# par(mfrow=c(2,2))
+# plot.legend <- c("Normal", "lognormal", "gamma","Weibull")
+# denscomp(list(fit_Norm,fit_LogNorm , fit_Gam, fit_Wei), legendtext = plot.legend)
+# cdfcomp (list(fit_Norm,fit_LogNorm , fit_Gam, fit_Wei), legendtext = plot.legend)
+# qqcomp  (list(fit_Norm,fit_LogNorm , fit_Gam, fit_Wei), legendtext = plot.legend)
+# ppcomp  (list(fit_Norm,fit_LogNorm , fit_Gam, fit_Wei), legendtext = plot.legend)
 
 # => La loi lognormal semble la loi la plus appropriée suivant le les densités, mais surtout le QQPlot et PPplot
 #''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -61,30 +63,12 @@ ppcomp  (list(fit_Norm,fit_LogNorm , fit_Gam, fit_Wei), legendtext = plot.legend
 
 ###### Decomposition en echantillons  ###### '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-# train <- P09_modele %>% sample_frac(0.8)
-# test <- anti_join(P09_modele, train,by="id")
-# Pour Obtenir une distribution des prix similaire pour l'apprentisage et le test:
-set.seed(1234)
-Id_train <- createDataPartition(P09_modele$price,1,p=0.8,list=FALSE)
-train <- P09_modele[Id_train,]
-test <- P09_modele[-Id_train,]
 
 # Indicateurs de comparaison des modeles
 DiffMod<-matrix(0,nrow=6,ncol=8)
 DiffMod[,1]<-c("Average IB error","Sigma IB error (RMSE)","R-squared","Average OB error","Sigma OB error (RMSE)","temps calcul (h)")
 colnames(DiffMod)<-c("Indicateurs","ReLM","ReGLM","Random_Forest1","Random_Forest2","Random_Forest3","GB_RegTree1","GB_RegTree2")
 
-#''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-
-###### Decomposition echantillon i ###### '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-train <- P09_modele %>% sample_frac(0.8)
-test <- anti_join(P09_modele, train, by="id")
-
-DiffMod<-matrix(0,nrow=5,ncol=2)
-row.names(DiffMod)<-c("Average IB error","Variance IB error","AIC","Average OB error","Variance OB error")
-colnames(DiffMod)<-c("ReLM","ReGLM")
 
 # # Modele 1
 # model_RL1 <- glm(price ~ zipcode, data = train, family='poisson')
@@ -114,7 +98,7 @@ colnames(DiffMod)<-c("ReLM","ReGLM")
 library(MASS)
 ### Modele Normal ###
 # Fit the full model 
-model_RStep <- lm(price ~., data = P09_modele)
+model_RStep <- lm(price ~., data = train)
 model_RStep_2 <- stepAIC(model_RStep, direction = "both", 
                             trace = FALSE)# Summary of the model
 summary(model_RStep_2)
@@ -128,8 +112,8 @@ DiffMod[1,2]<- mean(model_RStep_2$residuals)
 DiffMod[2,2]<- summary(model_RStep_2)$sigma
 DiffMod[3,2]<- summary(model_RStep_2)$adj.r.squared
 # Avec metric RMSE()
-train_pred <- predict(model_RStep_2,train)
-RMSE(train_pred,train$price)
+# train_pred <- predict(model_RStep_2,train)
+# RMSE(train_pred,train$price)
 
 # Erreur Out of bag
 Res_norm<- predict(model_RStep_2,test)
@@ -169,7 +153,7 @@ DiffMod[3,3]<- R2adj
 (1-summary(model_RLogStep_2 )$deviance /summary(model_RLogStep_2 )$null.deviance) 
 
 # Erreur Out of bag
-Res_Lognorm<- predict(model_RLogStep_2,test)
+test$Res_Lognorm<- predict(model_RLogStep_2,test)
 Diff_Lognorm<-exp(Res_Lognorm)-test$price
 plot_ly(x=~Diff_Lognorm, type='histogram')
 summary(Diff_Lognorm)
@@ -181,13 +165,7 @@ DiffMod[6,3]<- TdiffLog/60
 
 
 ###### Exportation résultats  ###### '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-model_RStep_2_Tidy <-tidy(model_RStep_2)
-write.csv(model_RStep_2_Tidy, file = "./R_script/Resultats/rl_Model.csv",row.names=FALSE, na="")
-
-model_RLogStep_2_Tidy <-tidy(model_RLogStep_2)
-write.csv(model_RLogStep_2_Tidy , file = "./R_script/Resultats/Logrl_Model.csv",row.names=FALSE, na="")
-
-write.csv(DiffMod, file = "./R_script/Resultats/Diff_Model.csv",row.names=TRUE, na="")
+saveRDS(model_RLogStep_2,"./shiny/R_data/model_RLogStep_2.rds")
 #''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 

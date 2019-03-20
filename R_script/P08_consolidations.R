@@ -86,14 +86,18 @@ P08_airbnb=dplyr::select(airbnb,
          l_qu= ifelse(l_qu %in% c("Sorbonne","Saint-Victor","Notre-Dame","Jardin-des-Plantes","Val-de-Grace","SalpÃªtriÃ¨re"),"Jardin-des-Plantes",l_qu)) %>%
   mutate(l_qu=as.factor(l_qu)) %>%
   mutate(amenities=gsub("\\{|\\}","",amenities)) %>% mutate(nb_amen=str_count(amenities, ',')) %>%
-  mutate(delai_inscription=as.numeric(delai_inscription))
+  mutate(delai_inscription=as.numeric(delai_inscription)) %>%
+  filter(!zipcode %in% c("75","75000","75106"))
 
-
-# amen= as.data.frame(stringr::str_split_fixed(toto$amenities, ',',max(str_count(toto$amenities, ',')))) 
-# amen= cbind(amen,select(airbnb, id))
-# amen_d = reshape2::melt(amen, id.vars="id") %>% filter(value != "")
-# amen_d_f=as.data.frame(table(amen_d$value))
-# amen_d_f = arrange(amen_d_f,-Freq) %>% head(60)
+#creation liste amenities
+amen= as.data.frame(stringr::str_split_fixed(airbnb$amenities, ',',max(str_count(airbnb$amenities, ','))))
+amen= cbind(amen,dplyr::select(airbnb, id))
+amen_d = reshape2::melt(amen, id.vars="id") %>% filter(value != "")
+amen_d_f=as.data.frame(table(amen_d$value))
+amen_d_f = arrange(amen_d_f,-Freq) %>% head(60)
+amen_d_f$Var1 = chartr('"{}',"   ",amen_d_f$Var1)
+amenities=unique(amen_d_f$Var1)
+saveRDS(amenities, "./shiny/R_data/amenities.rds")
 
 #### Autres variables qualitatives: regroupement de facteurs '''''''''''''''''''''''''''
 source(file = "./R_script/P08_RegroupFact.R")
@@ -108,7 +112,7 @@ P08_airbnb <- P08_airbnb %>% filter(price<=Quant98)  # temporaire pour test rapi
 sapply(P08_airbnb, function(y) sum(length(which(is.na(y)))))
 
 P08_airbnb[is.na(P08_airbnb)] <- 0
-P08_airbnb = select(P08_airbnb,id,price,
+P08_airbnb = dplyr::select(P08_airbnb,id,price,
                     #quartier
                     l_qu,
                     zipcode,
@@ -132,6 +136,7 @@ saveRDS(P08_airbnb_train, "./R_data/P08_airbnb_train.rds")
 saveRDS(P08_airbnb_test, "./R_data/P08_airbnb_test.rds")
 
 
-airbnb_shiny=select(airbnb,id,longitude,latitude,neighbourhood_cleansed,price, picture_url) %>% inner_join(select(P09_modele, id, l_qu,zipcode), by="id")
+airbnb_shiny=dplyr::select(airbnb,id,longitude,latitude,neighbourhood_cleansed,price, picture_url) %>% 
+  inner_join(dplyr::select(P09_modele, id, l_qu,zipcode), by="id")
 saveRDS(airbnb_shiny, "./R_data/airbnb_shiny.rds")
 saveRDS(airbnb_shiny, "./shiny//R_data/airbnb_shiny.rds")

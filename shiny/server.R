@@ -76,25 +76,13 @@ function(input, output) {
                       bedrooms=input$bedrooms,
                       bathrooms=input$bathrooms,
                       summary_l=length(input$summary),
-                      delai_inscription=difftime(as.Date("2019-01-01"),input$delai_inscription,tz="Europe/Paris","days"),
+                      delai_inscription=1000,
+                      nb_amen=length(input$amenities_),
+                      accommodates=input$accommodates,
                       host_total_listings_count=0L, stringsAsFactors = F)) %>%
       mutate(l_qu=factor(l_qu,levels=levels(airbnb$l_qu)),
              zipcode=factor(zipcode,levels=levels(airbnb$zipcode)))
-    model <- input$modele
-    if (model == "modelRF") {
-      predicted <- round(predict(modelRF, test2), 0)
-    } else {
-      #my_data <- P09_modele[0,]
-      #for (c in colnames(test2)) {
-      #  my_data[1, c] <- test2[1, c]
-      #}
-      if (!"host_since" %in% colnames(test2)) {
-        names <- setdiff(setdiff(colnames(P09_modele), "id"), colnames(test2))
-        test2[,names] <- NA
-        test2 <- mutate(test2, host_since=as.Date(host_since))
-      }
-      predicted <- round(predict(modelXGB, Matrix(test2, sparse = TRUE), type="raw"))
-    }
+      predicted <- round(exp(predict(model_RLogStep_2, test2)), 0)
   })
   
   output$price <- renderText(price_ml())

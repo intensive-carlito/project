@@ -23,7 +23,7 @@ dashboardPage(skin = "red",
               dashboardSidebar(
                 sidebarMenu(
                   menuItem("Visualisation / Carto", tabName = "carto"),
-                  menuItem("Autre", tabName = "Autre")
+                  menuItem("Prédiction", tabName = "Autre")
                 )
               ),
               
@@ -55,9 +55,11 @@ dashboardPage(skin = "red",
                             box(                 
                               title = "Description", status = "primary", solidHeader = TRUE,
                               collapsible = TRUE,
-                              sliderInput("bedrooms", "Nombre de lits dans l'appartements : ",min = 0, max = 10, value = c(1), step = 1),
-                              sliderInput("bathrooms", "Nombre de salle de bains dans l'appartements : ",min = 0, max = 10, value = c(1), step = 1),
-                              textInput("summary", label="Faites une description de l'appartement", value = " ")
+                              sliderInput("accommodates", "Nombre de personnes accueillies dans l'appartement : ",min = 1, max = 20, value = c(1), step = 1),
+                              sliderInput("bedrooms", "Nombre de lit dans l'appartement : ",min = 0, max = 10, value = c(1), step = 1),
+                              sliderInput("bathrooms", "Nombre de salle de bain dans l'appartement : ",min = 0, max = 10, value = c(1), step = 1),
+                              textInput("summary", label="Faites une description de l'appartement", value = " "),
+                              multiInput("amenities_", label = 'indiquez votre équipement', choices=amenities)
                             ),
                             checkboxInput("AlreadyCheckBox", "Avez vous déjà un compte AirBnb ?"),
                             conditionalPanel( condition = "input.AlreadyCheckBox==true",
