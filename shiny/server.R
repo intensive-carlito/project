@@ -10,6 +10,7 @@ function(input, output) {
     )
   })
   
+  
   output$mymap <- renderLeaflet({
     
     tmp <- leaflet() %>%
@@ -23,7 +24,7 @@ function(input, output) {
       tmp
     }
   })
-
+  
   Table_normalisation <- reactive({
     normalise <- GET(paste0("https://api-adresse.data.gouv.fr/search/?q=",chartr(",_/ ","+++++",input$inputAd)))
     ad=as.data.frame(content(normalise)$features[[1]])
