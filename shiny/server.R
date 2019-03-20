@@ -71,7 +71,7 @@ function(input, output) {
   
   
   price_ml <- reactive({
-    test2=(data.frame(l_qu=head(Table_normalisation(),1)$l_qu,
+    test2 <- (data.frame(l_qu=head(Table_normalisation(),1)$l_qu,
                       zipcode=as.character(head(Table_normalisation(),1)$properties.postcode),
                       bedrooms=input$bedrooms,
                       bathrooms=input$bathrooms,
@@ -80,9 +80,22 @@ function(input, output) {
                       host_total_listings_count=0L, stringsAsFactors = F)) %>%
       mutate(l_qu=factor(l_qu,levels=levels(airbnb$l_qu)),
              zipcode=factor(zipcode,levels=levels(airbnb$zipcode)))
-    predicted <- round(predict(model, test2),0)
+    model <- input$modele
+    if (model == "modelRF") {
+      predicted <- round(predict(modelRF, test2), 0)
+    } else {
+      #my_data <- P09_modele[0,]
+      #for (c in colnames(test2)) {
+      #  my_data[1, c] <- test2[1, c]
+      #}
+      if (!"host_since" %in% colnames(test2)) {
+        names <- setdiff(setdiff(colnames(P09_modele), "id"), colnames(test2))
+        test2[,names] <- NA
+        test2 <- mutate(test2, host_since=as.Date(host_since))
+      }
+      predicted <- round(predict(modelXGB, Matrix(test2, sparse = TRUE), type="raw"))
+    }
   })
   
- 
   output$price <- renderText(price_ml())
 }
