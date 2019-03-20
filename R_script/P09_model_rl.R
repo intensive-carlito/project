@@ -205,5 +205,8 @@ ggplot (data=Error,aes(x=ReLM))+
   geom_density(data=Error,aes(x=ReGLM),color="red")
 
 
-
+###### Test avec package leaps  ###### '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+# Model regression 
+library(leaps)
+model_RStep_2bis <- regsubsets(price ~., data = train,,nbest=1,nvmax=NULL)
 

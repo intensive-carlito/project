@@ -38,6 +38,12 @@ model_GB2 <- gbm(price ~.,data=train, distribution="gaussian",shrinkage = 0.1,n.
 T2<-Sys.time()
 TdiffGB2= difftime(T2, T1)
 
+## model_GB3 (shrinkage à 0.01,)
+T1<-Sys.time()
+model_GB3 <- gbm(price ~.,data=train, distribution="gaussian",shrinkage = 0.01,n.trees = 100000,cv.folds = 5,n.cores=3,interaction.depth = 3)
+T2<-Sys.time()
+TdiffGB3= difftime(T2, T1)
+
 # temps de calcul
 DiffMod[6,7]<- TdiffGB1
 DiffMod[6,8]<- TdiffGB2

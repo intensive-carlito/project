@@ -48,6 +48,7 @@ P08_airbnb$property_type <- gsub("Guesthouse","Other",P08_airbnb$property_type)
 P08_airbnb$property_type <- gsub("Hostel","Hotel",P08_airbnb$property_type) 
 P08_airbnb$property_type <- gsub("Townhouse","House",P08_airbnb$property_type) 
 P08_airbnb$property_type <- as.factor(P08_airbnb$property_type)
+# P08_airbnb = P08_airbnb %>% mutate(property_type = ifelse(property_type %in% c("Villa",""),"House", property_type))
 
 ### room_type '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 N_RoomT <- P08_airbnb %>% select(room_type) %>%
