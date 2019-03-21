@@ -366,56 +366,57 @@ list-style-type: none;
 
   </p>
 </div>
-<div id="les-donnees-utilisees-pour-realiser-ce-modele" class="slide section level1">
-<h1>Les données utilisées pour réaliser ce modèle</h1>
+<div id="les-donnees-air-bnb" class="slide section level1">
+<h1>Les données Air BnB</h1>
 <ul>
-<li><p>Le site <code>http://insideairbnb.com/</code> est la base de nos données. On a pu ainsi récupérer le fichier <code>listings.csv</code> contenant les appartements mis en location sur Air BNB à Paris (60 000 appartements)</p></li>
+<li><p>Le site <code>http://insideairbnb.com/</code> propose des fichiers csv à télécharger avec les appartements mis en location sur Air BnB. Nous avons donc récupéré un fichier <code>listings.csv</code> contenant environ 60 000 appartements à Paris.</p></li>
 <li>Nous avons nettoyé ce tableau :
 <ul>
 <li>Filtrage sur le code postal afin de n’avoir que du 75 ; vérification du code postal afin qu’il n’ait que 5 chiffres</li>
 <li>Conversions de certaines valeurs avec renommage des champs si nécessaire.</li>
 <li>Conversion des données de date en date au sens R.</li>
 <li>Les appartements dont les prix ne sont pas fournis sont supprimés.</li>
-<li>Ajout d’une colonne avec des intervalles de prix, considérés comme facteurs, ça peut être utile par la suite.</li>
+<li>Le script faisant ce travail est <code>P00_Projet_desc.R</code>.</li>
 </ul></li>
 </ul>
 </div>
-<div class="slide section level1">
-
+<div id="les-monuments-de-paris" class="slide section level1">
+<h1>Les monuments de Paris</h1>
 <ul>
-<li>Nous nous sommes aussi procuré la liste des monuments historiques. Cette liste est dans un fichier <code>merimee-MH-valid.csv</code>.</li>
-<li>A partir de ces infos, nous avons créé un dataframe <em>monuments</em> dans lequel nous n’avons gardé que les monuments de Paris (département 75).</li>
+<li><p>Nous nous sommes dit que les locataires étaient peut-être intéressés par une proximité entre leur location et les monuments parisiens.</p></li>
+<li>Un peu de scrapbooking sur le site <a href="http://monumentsdeparis.net/" class="uri">http://monumentsdeparis.net/</a> permet de récupérer les monuments parisiens ainsi que leurs adresses.</li>
+<li><p>Une seconde étape est d’utiliser l’API REST <code>adresse.data.gouv.fr</code> pour récupérer les adresses dans un format harmonisé et les longitudes/latitudes.</p></li>
+<li>L’étape suivante a été de déterminer pour chaque logement le nombre de monuments à moins de 100m, 200m, 500m et 1km.</li>
+<li><p>Le script faisant ce travail est <code>P04_monuments.R</code>. Le résultat est stocké dans la table <code>P04_dist_monuments</code>.</p></li>
 </ul>
 </div>
-<div class="slide section level1">
-
+<div id="les-gares-et-stations-de-metrorer" class="slide section level1">
+<h1>Les gares et stations de métro/RER</h1>
 <ul>
-<li>Une autre source de données est le fichier <code>accessibilite-des-gares-et-stations-metro-et-rer-ratp.csv</code> récupéré sur <code>https://www.data.gouv.fr/en/datasets/accessibilite-des-gares-et-stations-de-metro-et-rer-ratp-1/</code>.</li>
+<li><p>Comme pour les monuments, il est peut-être intéressant pour un locataire de chercher à ce que son logement soit proche de gares.</p></li>
+<li>Pour en mesurer, une autre source de données est le fichier <code>accessibilite-des-gares-et-stations-metro-et-rer-ratp.csv</code> récupéré sur <code>https://www.data.gouv.fr/en/datasets/accessibilite-des-gares-et-stations-de-metro-et-rer-ratp-1/</code>.</li>
 <li>Les retraitements de ce fichier consistent en :
 <ul>
 <li>Ne garder que les adresses du département 75.</li>
 <li>Supprimer les doublons</li>
 <li>Séparer la longitude et la latitude en deux colonnes distinctes.</li>
 </ul></li>
+<li>Et la dernière étape a consisté à déterminer le nombre de stations/gares à moins de 100m, 200m, 500m et 1km.</li>
+<li><p>Le script faisant ce travail est <code>P01_ratp.R</code>. Le résultat est stocké dans la table <code>P01_dist_RATP</code>.</p></li>
 </ul>
 </div>
-<div class="slide section level1">
-
+<div id="les-avis-des-locataires-sur-les-logements" class="slide section level1">
+<h1>Les avis des locataires sur les logements</h1>
 <ul>
-<li>Nous avons aussi récupéré le fichier <code>reviews.csv</code> contenant les revues des clients (1 000 000 de lignes).</li>
-<li>Nous avons construit les fichiers :
-<ul>
-<li><code>accessibilite-des-gares-et-stations-metro-et-rer.csv</code> contenant les 400 stations de métro parisiennes avec leurs positions.</li>
-<li><code>quartiers.rds</code> donnant Paris et ses 80 quartiers, plus précis que les arrondissements.</li>
-<li><code>Monuments de Paris</code> à partir de la base Mérimée (2000 données).</li>
-</ul></li>
-<li>Enfin le site <code>timeout.fr</code> peut nous permettre de récupérer les cent meilleurs bars de Paris.</li>
+<li>Nous avons récupéré un fichier <code>reviews.csv</code> sur <code>http://insideairbnb.com/</code> contenant les revues des clients (environ 1 000 000 de lignes).</li>
+<li>Nous avons tenté d’en extraire des informations mais la variété des langues a rendu son exploitation assez difficile.</li>
+<li>De plus, notre but étant d’estimer le prix d’une location que l’on aurait à proposer, il nous a semblé difficile d’avoir des revues dès le début.</li>
 </ul>
 </div>
 <div id="fabrication-des-quartiers" class="slide section level1">
 <h1>Fabrication des quartiers</h1>
 <ul>
-<li>Nous avons pu télécharger les quartiers de Paris sur le site <a href="https://opendata.paris.fr/explore/dataset/quartier_paris/export/" class="uri">https://opendata.paris.fr/explore/dataset/quartier_paris/export/</a>.</li>
+<li>Nous avons téléchargé les quartiers de Paris sur le site <a href="https://opendata.paris.fr/explore/dataset/quartier_paris/export/" class="uri">https://opendata.paris.fr/explore/dataset/quartier_paris/export/</a>.</li>
 <li><p>Nous avons exporté les id, latitudes, longitudes des différentes locations au format csv.</p></li>
 <li>Ces deux sources ont été importées dans le logiciel QGIS. Son outil d’intersection nous a alors permis de déterminer à quels quartiers appartiennent chacune des locations.</li>
 <li><p>Après cette opération, nous avons exporté le résultat dans le fichier <code>quartiers.csv</code>.</p></li>
@@ -425,47 +426,11 @@ list-style-type: none;
 <p class="caption">QGIS</p>
 </div>
 </div>
-<div id="recuperation-des-monuments" class="slide section level1">
-<h1>Récupération des monuments</h1>
-<p>Un peu de scrapbooking sur le site <a href="http://monumentsdeparis.net/" class="uri">http://monumentsdeparis.net/</a> permet de récupérer les monuments parisiens ainsi que leurs adresses. Une seconde étape est d’utiliser à nouveau adresse.data.gouv.fr pour récupérer les adresses dans un format harmonisé et les longitudes/latitudes.</p>
-<p>Ensuite, pour chaque logement, on compte combien de monuments sont à moins de 100m, 200m, 500m et 1km. Le script faisant ce travail est <code>P04_monuments.R</code>. Le résultat est stocké dans la table <code>P04_dist_monuments</code>.</p>
+<div id="premier-modele" class="slide section level1">
+<h1>Premier modèle</h1>
 </div>
-<div id="premiers-essais" class="slide section level1">
-<h1>Premiers essais</h1>
-<h2 id="la-base-air-bnb-seule">La base Air BnB seule</h2>
-<p>On a pris quelques champs donnés par la base Air BnB seule, on les a nettoyés puis on a fait une randomforest dessus.</p>
-<p>Le bilan est qu’on obtient deux composantes importantes qui sont <em>la longueur de la présentation de l’appartement</em> et <em>l’ancienneté de l’appartement sur Air BnB</em> On peut expliquer que le nombre de mots change beaucoup et il y a presque autant de cas que d’appartements présentés, ça peut expliquer un peu la représentativité. Idem pour le délai d’existence.</p>
-<p>On a ensuite fait des tranches de prix que l’on a transformés en factors. L’erreur est à 80%.</p>
-<p>On a regardé la répartition des prix par lieu dans deux cas :</p>
-<ul>
-<li>appartement pour 2 personnes</li>
-<li>tous les appartements</li>
-</ul>
-<p>On constate que ce serait sûrement intéressant de faire une classification avant de faire le modèle.</p>
-</div>
-<div id="pense-bete" class="slide section level1">
-<h1>Pense-bête</h1>
-<ul>
-<li>Création d’un property_type plus propre en ajoutant un <em>Divers</em></li>
-<li>Traductions automatiques</li>
-<li>ammenities à nettoyer et regarder ce qu’on peut en tirer</li>
-<li>positivité des messages / commentaires</li>
-</ul>
-</div>
-<div id="repartition-du-travail" class="slide section level1">
-<h1>Répartition du travail</h1>
-<h2 id="charles">Charles</h2>
-<p>R Shiny : première application avec des onglets</p>
-<h2 id="mathieu">Mathieu</h2>
-<p>Web scrapping pour les bars et les monuments.</p>
-<h2 id="david">David</h2>
-<ul>
-<li>Traduction des commentaires</li>
-<li>Analyse des sentiments</li>
-</ul>
-<p><code>curl -XPOST &quot;https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20181214T151349Z.e323c6a0eeb6c59d.6ed57788f95d2a05d4269fddb847986f8769b990&amp;text=ce%20chat%20est%20mignon&amp;lang=fr-en&amp;format=plain&quot;</code></p>
-<p>fait la traduction de <em>Ce chat est mignon</em> en <em>this cat is cute</em>.</p>
-<p>Problème rencontré : Lors d’une utilisation massive de la fonction <code>translate</code> dans une datatable, il arrive un moment où R Studio crashe. Pour palier à ce problème, j’ai fait un petit programme en Go qui fait le même travail.</p>
+<div class="slide section level1">
+
 <h2 id="repartition-des-prix">Répartition des prix</h2>
 <p>Si on trace la densité des prix, on réalise tout d’abord que les prix sont à valeurs dans l’intervalle <span class="math inline">\([0;+\infty[\)</span> et d’autre part, par rapport à l’intervalle de prix, cette densité a tendance à s’accumuler sur la gauche de l’intervalle.</p>
 <div class="figure">
