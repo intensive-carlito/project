@@ -30,7 +30,7 @@ function(input, output) {
     ad=as.data.frame(content(normalise)$features[[1]])
     if (dim(ad)[2] >= 2) {
       colnames(ad)[c(1,2)] <- c("longitude","latitude")
-      temp=dplyr::select(sample_frac(airbnb,0.1), latitude, longitude, neighbourhood_cleansed,l_qu, id, price,picture_url)
+      temp=dplyr::select(airbnb, latitude, longitude, neighbourhood_cleansed,l_qu, id, price,picture_url)
       mat2 <- as.data.frame(distm(setDT(temp)[,.(longitude,latitude)], setDT(ad)[,.(longitude,latitude)], fun=distVincentyEllipsoid))%>%
         cbind(dplyr::select(temp,neighbourhood_cleansed,l_qu, id, price,picture_url)) %>% arrange(V1) %>% head(3) %>% dplyr::select(neighbourhood_cleansed,l_qu, id, price,picture_url)
       ad = cbind(ad,mat2)
@@ -82,8 +82,14 @@ function(input, output) {
                       host_total_listings_count=0L, stringsAsFactors = F)) %>%
       mutate(l_qu=factor(l_qu,levels=levels(airbnb$l_qu)),
              zipcode=factor(zipcode,levels=levels(airbnb$zipcode)))
-      predicted <- round(exp(predict(model_RLogStep_2, test2)), 0)
+      predicted <- data.frame(modele=c("RandomForest",
+                                       # "GradientBoosting",
+                                       "Linéaire généralisé"), 
+                              prediction=c(round(predict(model_RF1, test2),0),
+                                           # round(predict(model_GB3, test2),0),
+                                           round(exp(predict(model_RLogStep_2, test2)),0))) %>%
+        rbind(data.frame(modele="Moyenne des modèles",prediction=mean(predicted$prediction)))
   })
   
-  output$price <- renderText(price_ml())
+  output$price <- renderTable(price_ml())
 }

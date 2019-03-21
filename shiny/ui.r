@@ -56,7 +56,7 @@ dashboardPage(skin = "red",
                             box(                 
                               title = "Description", status = "primary", solidHeader = TRUE,
                               collapsible = TRUE,
-                              sliderInput("accommodates", "Nombre de personnes accueillies dans l'appartement : ",min = 1, max = 20, value = c(1), step = 1),
+                              sliderInput("accommodates", "Nombre de personnes accueillies dans l'appartement : ",min = 1, max = 20, value = c(2), step = 1),
                               sliderInput("bedrooms", "Nombre de lit dans l'appartement : ",min = 0, max = 10, value = c(1), step = 1),
                               sliderInput("bathrooms", "Nombre de salle de bain dans l'appartement : ",min = 0, max = 10, value = c(1), step = 1),
                               textInput("summary", label="Faites une description de l'appartement", value = " "),
@@ -71,10 +71,11 @@ dashboardPage(skin = "red",
                                                           startview = 'year'),
                                                 numericInput("host_total_listings_count", label="Combien avez vous eu de visiteurs ?", value = 1,min=1,step	=1)
                                               )),
-                            column(4,
-                                   includeHTML("www/methodo.html")),
-                            column(4, offset = 1,
-                                   h1(textOutput("price")))
+                            box( includeHTML("www/methodo.html")),
+                            box(title = "Prédiction du Prix de location de l'appartement", status = "success", solidHeader = TRUE,
+                                collapsible = FALSE
+                                ,tableOutput("price")
+                                )
                           )
                   ), 
                   tabItem("methodo",
