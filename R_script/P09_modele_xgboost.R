@@ -1,13 +1,23 @@
 ############################# Modele Boosting ##########################
-library(dplyr)
-library(ggplot2)
+#library(dplyr)
+#library(ggplot2)
 library(xgboost)
 library(Matrix)
-library(plotly)
+#library(plotly)
 
 ###### Importation data ###### ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-P09_modele<-readRDS("./R_data/P08_airbnb.rds")
-sapply(P09_modele, function(y) sum(length(which(is.nan(y)))))
+modele_train <- readRDS("./R_data/P08_airbnb_train.rds")
+modele_test <- readRDS("./R_data/P08_airbnb_test.rds")
+
+sparse_train <- sparse.model.matrix(price ~ .-id, data = modele_train)[,-1]
+sparse_test <- sparse.model.matrix(price ~ .-id, data = modele_test)[,-1]
+
+dtrain <- xgb.DMatrix(sparse_train, label = modele_train$price)
+cv <- xgb.cv(data = dtrain, nrounds = 900, nthread = 4, nfold = 5, metrics = list("rmse"),
+             max_depth = 7, eta = 0.1, objective = "reg:linear")
+print(cv)
+print(cv, verbose=TRUE)
+
 
 ###### Essai basic d'entraînement XGBoost avec la librairie caret ########
 library("caret")
