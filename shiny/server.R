@@ -87,8 +87,8 @@ function(input, output) {
                                        "Linéaire généralisé"), 
                               prediction=c(round(predict(model_RF1, test2),0),
                                            # round(predict(model_GB3, test2),0),
-                                           round(exp(predict(model_RLogStep_2, test2)),0))) %>%
-        rbind(data.frame(modele="Moyenne des modèles",prediction=mean(predicted$prediction)))
+                                           round(exp(predict(model_RLogStep_2, test2)),0)))
+      predicted=predicted %>%  rbind(data.frame(modele="Moyenne des modèles",prediction=mean(predicted$prediction)))
   })
   
   output$price <- renderTable(price_ml())
