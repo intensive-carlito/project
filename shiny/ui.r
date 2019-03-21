@@ -59,7 +59,7 @@ dashboardPage(skin = "red",
                               sliderInput("accommodates", "Nombre de personnes accueillies dans l'appartement : ",min = 1, max = 20, value = c(2), step = 1),
                               sliderInput("bedrooms", "Nombre de lit dans l'appartement : ",min = 0, max = 10, value = c(1), step = 1),
                               sliderInput("bathrooms", "Nombre de salle de bain dans l'appartement : ",min = 0, max = 10, value = c(1), step = 1),
-                              textInput("summary", label="Faites une description de l'appartement", value = " "),
+                              textAreaInput("summary", label="Faites une description de l'appartement", value = "Décrivez ici votre appartement, l'emplacement, la proximité des métros, etc. Plus c'est long et plus vous pourrez louer votre appartement cher ! (mais chut !)", height = "300px"),
                               multiInput("amenities_", label = 'indiquez votre équipement', choices=amenities)
                             ),
                             checkboxInput("AlreadyCheckBox", "Avez vous déjà un compte AirBnb ?"),
@@ -75,7 +75,11 @@ dashboardPage(skin = "red",
                             box(title = "Prédiction du Prix de location de l'appartement", status = "success", solidHeader = TRUE,
                                 collapsible = FALSE
                                 ,tableOutput("price")
-                                )
+                                ),
+                            box(title = "Pour vous aider à rédiger votre annonce, voici un nuage de mots des annonces en anglais et en francais", status = "primary", solidHeader = TRUE,
+                              collapsible = TRUE,
+                              tags$img(src ="english.png"),tags$img(src ="french.png")
+                            )
                           )
                   ), 
                   tabItem("methodo",
