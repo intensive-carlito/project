@@ -15,21 +15,12 @@ library("doParallel")
 library("foreach")
 
 ###### Importation data ###### ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-P09_modele<-readRDS("./R_data/P08_airbnb.rds")
+train<-readRDS("./R_data/P08_airbnb_train.rds")
+test<-readRDS("./R_data/P08_airbnb_test.rds")
+train <- train %>% dplyr::select(-id)
+test <- test %>% dplyr::select(-id)
 
 #''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-###### Retrait de certaines variables (pour espace) ''''''''''''''''''''''
-P09_modele <- P09_modele %>% dplyr::select(-amenities,-id)
-
-###### Decomposition en echantillons  ###### '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-# train <- P09_modele %>% sample_frac(0.8)
-# test <- anti_join(P09_modele, train,by="id")
-# Pour Obtenir une distribution des prix similaire pour l'apprentisage et le test:
-set.seed(1234)
-Id_train <- createDataPartition(P09_modele$price,1,p=0.8,list=FALSE)
-train <- P09_modele[Id_train,]
-test <- P09_modele[-Id_train,]
 
 ###### Indicateurs de comparaison des modeles ''''''''''''''''''''''''''''''
 DiffMod <- read.csv("./R_script/Resultats/Diff_Model.csv", sep = ",")
@@ -91,11 +82,11 @@ plot_ly(x=~(Diff_RF1_RF2), type='histogram')
 ###### Analyse resultat '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ## RF1
 #Erreur modele apprentissage
-plot_ly(x=~(model_RF1$predicted-train$price), type='histogram')
+# plot_ly(x=~(model_RF1$predicted-train$price), type='histogram')
 DiffMod[1,4]<- mean(model_RF1$predicted-train$price)
 DiffMod[2,4]<- var(model_RF1$predicted-train$price)^(0.5)
 DiffMod[3,4]<- 1-sum((model_RF1$predicted-train$price)^2)/sum((train$price-mean(train$price))^2)
-1-var(model_RF1$predicted-train$price)/var(train$price)
+# 1-var(model_RF1$predicted-train$price)/var(train$price)
 
 #Erreur modele OOB
 Res_RF1<- predict(model_RF1,test)
@@ -105,11 +96,11 @@ DiffMod[5,4]<- var(Diff_RF1)^(0.5)
 
 ## RF2
 #Erreur modele apprentissage
-plot_ly(x=~(model_RF2$predicted-train$price), type='histogram')
+# plot_ly(x=~(model_RF2$predicted-train$price), type='histogram')
 DiffMod[1,5]<- mean(model_RF2$predicted-train$price)
 DiffMod[2,5]<- var(model_RF2$predicted-train$price)^(0.5)
 DiffMod[3,5]<- 1-sum((model_RF2$predicted-train$price)^2)/sum((train$price-mean(train$price))^2)
-sum(model_RF2$predicted-mean(train$price))^2/sum(train$price-mean(train$price))^2
+# sum(model_RF2$predicted-mean(train$price))^2/sum(train$price-mean(train$price))^2
 
 #Erreur modele OOB
 Res_RF2<- predict(model_RF2,test)
@@ -119,11 +110,11 @@ DiffMod[5,5]<- var(Diff_RF2)^(0.5)
 
 ## RF3
 #Erreur modele apprentissage
-plot_ly(x=~(model_RF3$predicted-train$price), type='histogram')
+# plot_ly(x=~(model_RF3$predicted-train$price), type='histogram')
 DiffMod[1,6]<- mean(model_RF3$predicted-train$price)
 DiffMod[2,6]<- var(model_RF3$predicted-train$price)^(0.5)
 DiffMod[3,6]<- 1-sum((model_RF3$predicted-train$price)^2)/sum((train$price-mean(train$price))^2)
-sum(model_RF3$predicted-mean(train$price))^2/sum(train$price-mean(train$price))^2
+# sum(model_RF3$predicted-mean(train$price))^2/sum(train$price-mean(train$price))^2
 
 #Erreur modele OOB
 Res_RF3<- predict(model_RF3,test)
@@ -169,5 +160,9 @@ ggsave("./R_script/Resultats/Mean_De_ACC2",plot=Mean_De_ACC2,device= "png")
 
 ###### Exportation résultats  ###### '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 write.csv(DiffMod, file = "./R_script/Resultats/Diff_Model.csv",row.names=TRUE, na="")
+saveRDS(model_RF1,"./shiny/R_data/model_RF1.rds")
+saveRDS(model_RF3,"./shiny/R_data/model_RF2.rds")
 
 #''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
