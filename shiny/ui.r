@@ -78,7 +78,7 @@ dashboardPage(skin = "red",
                           )
                   ), 
                   tabItem("methodo",
-                          a("test",href="~/www/notes.html"))
+                          a("test", href="notes.html", target='blank'))
                 )
               )
 )
