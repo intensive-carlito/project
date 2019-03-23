@@ -51,7 +51,7 @@ dashboardPage(skin = "red",
                               textInput("inputAd", "Emplacement de l'appartement : ", value = "10 rue de naravin, 75009, paris", width = NULL, placeholder = NULL),
                               tableOutput('table'),
                               leafletOutput("mymap_norm"),
-                              tableOutput("table_3_plus_proche")
+                              dataTableOutput("table_3_plus_proche")
                             ),
                             box(                 
                               title = "Description", status = "primary", solidHeader = TRUE,

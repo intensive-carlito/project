@@ -30,9 +30,10 @@ function(input, output) {
     ad=as.data.frame(content(normalise)$features[[1]])
     if (dim(ad)[2] >= 2) {
       colnames(ad)[c(1,2)] <- c("longitude","latitude")
-      temp=dplyr::select(airbnb, latitude, longitude, neighbourhood_cleansed,l_qu, id, price,picture_url)
+      temp=dplyr::select(airbnb, latitude, longitude, neighbourhood_cleansed,l_qu, id, price,picture_url,bedrooms,accommodates,name)
       mat2 <- as.data.frame(distm(setDT(temp)[,.(longitude,latitude)], setDT(ad)[,.(longitude,latitude)], fun=distVincentyEllipsoid))%>%
-        cbind(dplyr::select(temp,neighbourhood_cleansed,l_qu, id, price,picture_url)) %>% arrange(V1) %>% head(3) %>% dplyr::select(neighbourhood_cleansed,l_qu, id, price,picture_url)
+        cbind(dplyr::select(temp,neighbourhood_cleansed,l_qu, id, price,picture_url,bedrooms,accommodates,name)) %>% arrange(V1) %>% 
+        dplyr::select(neighbourhood_cleansed,l_qu, id, price,picture_url,bedrooms,accommodates,name)
       ad = cbind(ad,mat2)
     }
     else {
@@ -41,12 +42,6 @@ function(input, output) {
     ad
   })
   
-  # Table_plus_proche <- reactive({
-  #   mat2 <- as.data.frame(distm(setDT(Table_normalisation())[,.(longitude,latitude)], setDT(ad)[,.(longitude,latitude)], fun=distVincentyEllipsoid))%>%
-  #       cbind(dplyr::select(temp,neighbourhood_cleansed,l_qu)) %>% arrange(V1) %>% head(1) %>% dplyr::select(neighbourhood_cleansed,l_qu)
-  #     ad = cbind(ad,mat2)
-  # })
-  
   output$table <- renderTable(dplyr::select(head(Table_normalisation(),1),
                                             Adresse_normalisee=properties.label,
                                             precision_de_la_normalisation=properties.type,
@@ -54,11 +49,13 @@ function(input, output) {
                                             Quartier_bdd_Airbnb=neighbourhood_cleansed,
                                             sous_quartier=l_qu))
   
-  output$table_3_plus_proche <- DT::renderDataTable(DT::datatable(dplyr::select(mutate(Table_normalisation(),
-                                                                                       lien=paste0("<a href='https://www.airbnb.com/rooms/", as.character(id),"' target='_blank'>",id,"</a>"),
+  output$table_3_plus_proche <- DT::renderDataTable({dplyr::select(mutate(head(filter(Table_normalisation(),bedrooms==input$bedrooms,
+                                                                                                   accommodates==input$accommodates,
+                                                                                                   l_qu==head(Table_normalisation(),1)$l_qu),4),
+                                                                                       # lien=paste0("<a href='https://www.airbnb.com/rooms/", as.character(id),"' target='_blank'>",name,"</a>"),
+                                                                          lien=sprintf('<a href="https://www.airbnb.com/rooms/%s" target="_blank"">%s</a>',id,name),
                                                                                        picture_url=paste0('<img src=',picture_url,' height="52"></img>')),
-                                                                                lien, price,picture_url),escape = FALSE))
-
+                                                                                lien, price,picture_url)},escape = FALSE)
   output$mymap_norm <- renderLeaflet({
     
     leaflet() %>%
@@ -76,17 +73,17 @@ function(input, output) {
                       bedrooms=input$bedrooms,
                       bathrooms=input$bathrooms,
                       summary_l=length(input$summary),
-                      delai_inscription=1000,
+                      delai_inscription=as.numeric(difftime(Sys.time(),input$delai_inscription,tz="Europe/Paris","days")),
                       nb_amen=length(input$amenities_),
                       accommodates=input$accommodates,
-                      host_total_listings_count=0L, stringsAsFactors = F)) %>%
+                      host_total_listings_count=input$host_total_listings_count, stringsAsFactors = F)) %>%
       mutate(l_qu=factor(l_qu,levels=levels(airbnb$l_qu)),
              zipcode=factor(zipcode,levels=levels(airbnb$zipcode)))
       predicted <- data.frame(modele=c("RandomForest",
-                                       # "GradientBoosting",
+                                       "Generalized Boosted Regression Modeling",
                                        "Linéaire généralisé"), 
                               prediction=c(round(predict(model_RF1, test2),0),
-                                           # round(predict(model_GB3, test2),0),
+                                           round(predict(model_GB3, test2),0),
                                            round(exp(predict(model_RLogStep_2, test2)),0)))
       predicted=predicted %>%  rbind(data.frame(modele="Moyenne des modèles",prediction=mean(predicted$prediction)))
   })
