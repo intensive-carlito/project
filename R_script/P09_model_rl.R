@@ -108,6 +108,10 @@ T1<-Sys.time()
 #DiffMod[4,2]<- mean(Diff_norm)
 #DiffMod[5,2]<- sqrt(var(Diff_norm))
 #DiffMod[6,2]<- TdiffLM/3600
+#rs1 = rstudent(model_RStep)
+#length(rs1[rs1>=-2 & rs1<=2])/length(rs1)
+#plot(rs1)
+#abline(h=c(-2,0,2), col="red")
 
 model_RStep_2 <- stepAIC(model_RStep, direction = "both", 
                             trace = FALSE)# Summary of the model
@@ -146,6 +150,20 @@ DiffMod[6,2]<- TdiffLM/3600
 model_RLogStep <- glm(price ~., data = train, family='poisson')
 # Model step_wise regression
 T1<-Sys.time()
+#DiffMod[1,3]<- mean(exp(model_RLogStep$residuals))
+#DiffMod[2,3]<- var(exp(model_RLogStep$residuals))^(0.5)
+#R2<-(1-var(exp(model_RLogStep$residuals))/var(train$price))
+#R2adj<- 1-(1-R2)*(length(train$price)-1)/(length(train$price)-length(coef(summary(model_RLogStep)))-1-1)
+#DiffMod[3,3]<- R2adj
+# Erreur Out of bag
+#Res_Lognorm<- predict(model_RLogStep,test)
+#Diff_Lognorm<-exp(Res_Lognorm)-test$price
+# plot_ly(x=~Diff_Lognorm, type='histogram')
+# summary(Diff_Lognorm)
+#DiffMod[4,3]<- mean(Diff_Lognorm)
+#DiffMod[5,3]<- var(Diff_Lognorm)^(0.5)
+
+
 model_RLogStep_2 <- stepAIC(model_RLogStep, direction = "both", 
                       trace = FALSE)# Summary of the model
 T2<-Sys.time()

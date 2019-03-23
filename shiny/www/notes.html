@@ -542,16 +542,16 @@ list-style-type: none;
 <li>summary_l</li>
 </ul>
 </div>
-<div id="regression-lineaire-avec-les-9-variables-selectionnees" class="slide section level1">
-<h1>Régression linéaire avec les 9 variables sélectionnées</h1>
+<div id="regressions-lineaires-avec-les-9-variables-selectionnees" class="slide section level1">
+<h1>Régressions linéaires avec les 9 variables sélectionnées</h1>
 <ul>
 <li>Deux régressions sont faites :
 <ul>
-<li>Une première avec les dix variables :
+<li>Une première avec les 9 variables :
 <ul>
 <li>bedrooms, accommodates, l_qu, zipcode, host_total_listings_count, bathrooms, delai_inscription, nb_amen, summary_l</li>
 </ul></li>
-<li>Une seconde avec une application du critère AIC qui a réduit les variables à 8 :
+<li>Une seconde avec une application du critère AIC qui a réduit les variables à 7 :
 <ul>
 <li>bedrooms, accomodates, l_qu, zipcode, host_total_listings_count, bathrooms, nb_amen, summary_l (beds et delai_inscription sont supprimés)</li>
 </ul></li>
@@ -591,10 +591,57 @@ list-style-type: none;
 <td align="right">45.7526416</td>
 <td align="right">45.7536759</td>
 </tr>
+</tbody>
+</table>
+</div>
+<div id="regressions-log-lineaires-avec-les-9-variables-selectionnees" class="slide section level1">
+<h1>Régressions log linéaires avec les 9 variables sélectionnées</h1>
+<ul>
+<li>Deux régressions sont faites :
+<ul>
+<li>Une première avec les 9 variables :
+<ul>
+<li>bedrooms, accommodates, l_qu, zipcode, host_total_listings_count, bathrooms, delai_inscription, nb_amen, summary_l</li>
+</ul></li>
+<li>Une seconde avec une application du critère AIC qui a réduit les variables à 7 :
+<ul>
+<li>bedrooms, accomodates, l_qu, zipcode, host_total_listings_count, bathrooms, nb_amen, summary_l (beds et delai_inscription sont supprimés)</li>
+</ul></li>
+</ul></li>
+</ul>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Indicateur</th>
+<th align="right">GLM1</th>
+<th align="right">GLM2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Average IB error</td>
+<td align="right">1.1819208</td>
+<td align="right">1.1819203</td>
+</tr>
 <tr class="even">
-<td align="left">Temps calcul en h</td>
-<td align="right">0.0018385</td>
-<td align="right">0.0018385</td>
+<td align="left"><span class="math inline">\(\sigma\)</span> IB error (RMSE)</td>
+<td align="right">4.3802243</td>
+<td align="right">4.3799825</td>
+</tr>
+<tr class="odd">
+<td align="left"><span class="math inline">\(R^2_a\)</span></td>
+<td align="right">0.9950697</td>
+<td align="right">0.9950707</td>
+</tr>
+<tr class="even">
+<td align="left">Average OB error</td>
+<td align="right">0.7347406</td>
+<td align="right">0.7347344</td>
+</tr>
+<tr class="odd">
+<td align="left"><span class="math inline">\(\sigma\)</span> OB error (RMSE)</td>
+<td align="right">47.4262325</td>
+<td align="right">47.4262531</td>
 </tr>
 </tbody>
 </table>

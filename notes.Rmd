@@ -142,17 +142,38 @@ Les 9 variables les plus importantes (par croisement des deux) que nous avons ch
 
 ---
 
-# Régression linéaire avec les 9 variables sélectionnées
+# Régressions linéaires avec les 9 variables sélectionnées
 
 * Deux régressions sont faites :
-  * Une première avec les dix variables :
+  * Une première avec les 9 variables :
     * bedrooms, accommodates, l_qu, zipcode, host_total_listings_count, bathrooms, delai_inscription, nb_amen, summary_l
-  * Une seconde avec une application du critère AIC qui a réduit les variables à 8 :
+  * Une seconde avec une application du critère AIC qui a réduit les variables à 7 :
     * bedrooms, accomodates, l_qu, zipcode, host_total_listings_count, bathrooms, nb_amen, summary_l (beds et delai_inscription sont supprimés)
 
 ```{r resultLM,echo=F}
-tabl <- data.frame(Indicateur = c("Average IB error", "$\\sigma$ IB error (RMSE)", "$R^2_a$", "Average OB error", "$\\sigma$ OB error (RMSE)", "Temps calcul en h"),
-                   LM1=c(4.03412137823296e-15, 44.7820916530383, 0.48827020151371, 0.625523131513831, 45.7526415862631, 0.00183849917517768),
-                   LM2=c(1.24463403514636e-14, 44.7824626353489, 0.48826172296872, 0.623229361866199, 45.7536758787619, 0.00183849917517768))
+tabl <- data.frame(Indicateur = c("Average IB error", "$\\sigma$ IB error (RMSE)", "$R^2_a$", "Average OB error", "$\\sigma$ OB error (RMSE)"),
+                   LM1=c(4.03412137823296e-15, 44.7820916530383, 0.48827020151371, 0.625523131513831, 45.7526415862631),
+                   LM2=c(1.24463403514636e-14, 44.7824626353489, 0.48826172296872, 0.623229361866199, 45.7536758787619))
 knitr::kable(tabl)
 ```
+
+---
+
+# Régressions log linéaires avec les 9 variables sélectionnées
+
+* Deux régressions sont faites :
+  * Une première avec les 9 variables :
+    * bedrooms, accommodates, l_qu, zipcode, host_total_listings_count, bathrooms, delai_inscription, nb_amen, summary_l
+  * Une seconde avec une application du critère AIC qui a réduit les variables à 7 :
+    * bedrooms, accomodates, l_qu, zipcode, host_total_listings_count, bathrooms, nb_amen, summary_l (beds et delai_inscription sont supprimés)
+
+```{r resultGLM,echo=F}
+tabl <- data.frame(Indicateur = c("Average IB error", "$\\sigma$ IB error (RMSE)", "$R^2_a$", "Average OB error", "$\\sigma$ OB error (RMSE)"),
+                   GLM1=c(1.18192082968798, 4.38022431314205, 0.995069715042558, 0.73474059255429, 47.4262325330374),
+                   GLM2=c(1.18192030421104, 4.37998251476438, 0.995070691872251, 0.734734397497239, 47.4262531471582))
+knitr::kable(tabl)
+```
+
+---
+
+
