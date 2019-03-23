@@ -127,7 +127,6 @@ P08_airbnb = dplyr::select(P08_airbnb,id,price,
                     host_total_listings_count)
 
 saveRDS(P08_airbnb, "./R_data/P08_airbnb.rds")
-# P08_airbnb=readRDS("./R_data/P08_airbnb.rds")
 
 set.seed(1234)
 Id_train <- createDataPartition(P08_airbnb$price,1,p=0.8,list=FALSE)
@@ -137,7 +136,7 @@ saveRDS(P08_airbnb_train, "./R_data/P08_airbnb_train.rds")
 saveRDS(P08_airbnb_test, "./R_data/P08_airbnb_test.rds")
 
 
-airbnb_shiny=dplyr::select(airbnb,id,longitude,latitude,neighbourhood_cleansed,price, picture_url, bedrooms,accommodates, name) %>% 
-  inner_join(dplyr::select(P08_airbnb, id, l_qu,zipcode), by="id")
+airbnb_shiny=dplyr::select(airbnb,id,longitude,latitude,neighbourhood_cleansed,price, picture_url) %>% 
+  inner_join(dplyr::select(P09_modele, id, l_qu,zipcode), by="id")
 saveRDS(airbnb_shiny, "./R_data/airbnb_shiny.rds")
 saveRDS(airbnb_shiny, "./shiny//R_data/airbnb_shiny.rds")

@@ -80,7 +80,7 @@ function(input, output) {
       mutate(l_qu=factor(l_qu,levels=levels(airbnb$l_qu)),
              zipcode=factor(zipcode,levels=levels(airbnb$zipcode)))
       predicted <- data.frame(modele=c("RandomForest",
-                                       "Generalized Boosted Regression Modeling",
+                                       "GradientBoosting",
                                        "Linéaire généralisé"), 
                               prediction=c(round(predict(model_RF1, test2),0),
                                            round(predict(model_GB3, test2),0),
