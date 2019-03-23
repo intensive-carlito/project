@@ -118,22 +118,41 @@ On a obtenu les graphiques suivants...
 
 ---
 
+# Importance des variables
+
 ![Importance des variables (Mean decrease accuracy)](./images/Mean_De_ACC.png){width=500px}
 
 ![Importance des variables (Mean Decrease GINI](./images/Mean_De_GINI.png){width=500px}
 
 ---
 
-Les 10 variables les plus importantes (par croisement des deux) que nous avons choisies :
+# Sélection des variables
 
-* Bedrooms
-* accomodates
+Les 9 variables les plus importantes (par croisement des deux) que nous avons choisies :
+
+* bedrooms
+* accommodates
 * l_qu
-* zip_code
-* host_total_listing_count
+* zipcode
+* host_total_listings_count
 * bathrooms
-* beds
 * delai_inscription
-* host_since
-* n_1000
+* nb_amen
+* summary_l
 
+---
+
+# Régression linéaire avec les 9 variables sélectionnées
+
+* Deux régressions sont faites :
+  * Une première avec les dix variables :
+    * bedrooms, accommodates, l_qu, zipcode, host_total_listings_count, bathrooms, delai_inscription, nb_amen, summary_l
+  * Une seconde avec une application du critère AIC qui a réduit les variables à 8 :
+    * bedrooms, accomodates, l_qu, zipcode, host_total_listings_count, bathrooms, nb_amen, summary_l (beds et delai_inscription sont supprimés)
+
+```{r resultLM,echo=F}
+tabl <- data.frame(Indicateur = c("Average IB error", "$\\sigma$ IB error (RMSE)", "$R^2_a$", "Average OB error", "$\\sigma$ OB error (RMSE)", "Temps calcul en h"),
+                   LM1=c(4.03412137823296e-15, 44.7820916530383, 0.48827020151371, 0.625523131513831, 45.7526415862631, 0.00183849917517768),
+                   LM2=c(1.24463403514636e-14, 44.7824626353489, 0.48826172296872, 0.623229361866199, 45.7536758787619, 0.00183849917517768))
+knitr::kable(tabl)
+```

@@ -98,6 +98,17 @@ library(MASS)
 # Fit the full model 
 model_RStep <- lm(price ~., data = train)
 T1<-Sys.time()
+
+# Pour récupérer les résultats de la première régression.
+#DiffMod[1,2]<- mean(model_RStep$residuals)
+#DiffMod[2,2]<- summary(model_RStep)$sigma
+#DiffMod[3,2]<- summary(model_RStep)$adj.r.squared
+#Res_norm<- predict(model_RStep,test)
+#Diff_norm<-Res_norm-test$price
+#DiffMod[4,2]<- mean(Diff_norm)
+#DiffMod[5,2]<- sqrt(var(Diff_norm))
+#DiffMod[6,2]<- TdiffLM/3600
+
 model_RStep_2 <- stepAIC(model_RStep, direction = "both", 
                             trace = FALSE)# Summary of the model
 T2<-Sys.time()
