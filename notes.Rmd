@@ -68,16 +68,72 @@ output:
 
 ---
 
-# Premier modèle
+# Premiers modèles
+
+* Une fois toutes nos données regroupées, nous avons commencé par expérimenter quelques modèles :
+  * Régression linéaire
+  * Régression log linéaire
+  * Random Forest avec 500 arbres.
 
 ---
 
-## Répartition des prix
+# Densité des prix
 
-Si on trace la densité des prix, on réalise tout d'abord que les prix sont à valeurs dans l'intervalle $[0;+\infty[$ et d'autre part, par rapport à l'intervalle de prix, cette densité a tendance à s'accumuler sur la gauche de l'intervalle.
+* Les prix sont à valeurs dans l'intervalle $[0;+\infty[$. Il est probable que la distribution des prix ne suit pas une loi normale...
+* Si on trace la densité des prix, on obtient :
 
-![Densite-prix](./notes/densite-prix.png)
+![Densite-prix](./images/densite-prix.png)
 
-Il semble donc judicieux de travailler sur le log des prix. Dans ce cas, la densité de $\log(price)$ est beaucoup plus centrée et ressemble davantage à une gaussienne.
+---
 
-![Densite-prix](./notes/densite-log-prix.png)
+* Traçons maintenant la densité du $\log$ des prix. On obtient alors :
+
+![Densite-prix](./images/densite-log-prix.png)
+
+* Courbe qui ressemble davantage à une gaussienne.
+* Plutôt que d'utiliser une régression linéaire pour donner le prix, il semble plus judicieux d'utiliser une régression $\log$ linéaire (régression de Poisson).
+
+---
+
+# Quelques résultats sur ces premiers modèles
+
+
+```{r functions,echo=F}
+tabl <- data.frame(Indicateur = c("Average IB error", "$\\sigma$ IB error (RMSE)", "$R^2_a$", "Average OB error", "$\\sigma$ OB error (RMSE)"),
+                   LM=c(0, 43.41, 0.52, 0.51, 36.75), GLM=c(1.35, 32.32, 0.73, 0.68, 44.18),
+                   RF=c(0.27, 37.79, 0.64, 0.51, 36.75))
+knitr::kable(tabl)
+```
+
+---
+
+# Choix des variables
+
+A partir du random forest, nous avons déterminé l'importance des variables avec deux méthodes :
+
+* Mean decrease accuracy
+* Mean decrease GINI
+
+On a obtenu les graphiques suivants...
+
+---
+
+![Importance des variables (Mean decrease accuracy)](./images/Mean_De_ACC.png){width=500px}
+
+![Importance des variables (Mean Decrease GINI](./images/Mean_De_GINI.png){width=500px}
+
+---
+
+Les 10 variables les plus importantes (par croisement des deux) que nous avons choisies :
+
+* Bedrooms
+* accomodates
+* l_qu
+* zip_code
+* host_total_listing_count
+* bathrooms
+* beds
+* delai_inscription
+* host_since
+* n_1000
+
