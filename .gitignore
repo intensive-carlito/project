@@ -4,3 +4,4 @@
 .Ruserdata
 *.gz
 model_*.rds
+model_*.RDS
