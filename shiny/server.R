@@ -32,8 +32,8 @@ function(input, output) {
       colnames(ad)[c(1,2)] <- c("longitude","latitude")
       temp=dplyr::select(airbnb, latitude, longitude, neighbourhood_cleansed,l_qu, id, price,picture_url,bedrooms,accommodates,name)
       mat2 <- as.data.frame(distm(setDT(temp)[,.(longitude,latitude)], setDT(ad)[,.(longitude,latitude)], fun=distVincentyEllipsoid))%>%
-        cbind(dplyr::select(temp,neighbourhood_cleansed,l_qu, id, price,picture_url,bedrooms,accommodates,name)) %>% arrange(V1) %>% 
-        dplyr::select(neighbourhood_cleansed,l_qu, id, price,picture_url,bedrooms,accommodates,name)
+        cbind(dplyr::select(temp,neighbourhood_cleansed,l_qu, id, price,picture_url,bedrooms,accommodates,name,longitude,latitude)) %>% arrange(V1) %>% 
+        dplyr::select(neighbourhood_cleansed,l_qu, id, price,picture_url,bedrooms,accommodates,name,longitude_pp=longitude,latitude_pp=latitude)
       ad = cbind(ad,mat2)
     }
     else {
@@ -49,20 +49,23 @@ function(input, output) {
                                             Quartier_bdd_Airbnb=neighbourhood_cleansed,
                                             sous_quartier=l_qu))
   
-  output$table_3_plus_proche <- DT::renderDataTable({dplyr::select(mutate(head(filter(Table_normalisation(),bedrooms==input$bedrooms,
-                                                                                                   accommodates==input$accommodates,
-                                                                                                   l_qu==head(Table_normalisation(),1)$l_qu),4),
-                                                                                       # lien=paste0("<a href='https://www.airbnb.com/rooms/", as.character(id),"' target='_blank'>",name,"</a>"),
-                                                                          lien=sprintf('<a href="https://www.airbnb.com/rooms/%s" target="_blank"">%s</a>',id,name),
-                                                                                       picture_url=paste0('<img src=',picture_url,' height="52"></img>')),
-                                                                                lien, price,picture_url)},escape = FALSE)
+  Table_3_plus_proche <- reactive({dplyr::select(mutate(head(filter(Table_normalisation(),bedrooms==input$bedrooms,
+                                   accommodates==input$accommodates,
+                                   l_qu==head(Table_normalisation(),1)$l_qu),4),
+                       # lien=paste0("<a href='https://www.airbnb.com/rooms/", as.character(id),"' target='_blank'>",name,"</a>"),
+                       lien=sprintf('<a href="https://www.airbnb.com/rooms/%s" target="_blank"">%s</a>',id,name),
+                       picture_url=paste0('<img src=',picture_url,' height="52"></img>')),
+                lien, price,picture_url,longitude_pp,latitude_pp)  })
+  
+  output$table_3_plus_proche <- DT::renderDataTable({select(Table_3_plus_proche(),-longitude_pp,-latitude_pp)},escape = FALSE)
+  
   output$mymap_norm <- renderLeaflet({
     
     leaflet() %>%
       addProviderTiles(providers$Esri,options = providerTileOptions(noWrap = TRUE)) %>%
-      addMarkers(data = Table_normalisation(),~longitude, ~latitude, label = ~as.character(properties.label)) %>%
-      addPolygons(data= arrondissement,stroke = TRUE, smoothFactor = 0.2, fillOpacity = 0.01) #%>%
-      #addHeatmap(data = airbnb, intensity=~price, lng=~longitude, lat=~latitude, max=.6, blur = 60)
+      addAwesomeMarkers(data = head(Table_normalisation(),1),~longitude, ~latitude, label = ~as.character(properties.label), icon = awesomeIcons(markerColor = "red")) %>%
+      addPolygons(data= arrondissement,stroke = TRUE, smoothFactor = 0.2, fillOpacity = 0.01) %>%
+      addAwesomeMarkers(data = Table_3_plus_proche(), lng=~longitude_pp, lat=~latitude_pp, label = ~as.character(lien), icon = awesomeIcons(markerColor = "blue"))
     
   })
   
