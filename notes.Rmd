@@ -1,5 +1,11 @@
 ---
 title: "Air BnB à Paris"
+author:
+  - Charles Picard
+  - Mathieu Giardini
+  - David Boucher
+#abstract: "J'ai un appartement à Paris que je voudrais mettre en location sur Air BnB. A quel prix pourrais-je le louer ?"
+
 output:
   slidy_presentation: default
   beamer_presentation: default
@@ -10,14 +16,13 @@ output:
 
 # Les données Air BnB
 
-* Le site `http://insideairbnb.com/` propose des fichiers csv à télécharger avec les appartements mis en location sur Air BnB. Nous avons donc récupéré un fichier `listings.csv` contenant environ 60 000 appartements à Paris.
+* Le site `http://insideairbnb.com/` propose des fichiers _csv_ contenant les données du site Air BnB. Nous avons donc récupéré un fichier `listings.csv` contenant environ 60 000 appartements à Paris.
 
 * Nous avons nettoyé ce tableau :
   * Filtrage sur le code postal afin de n'avoir que du 75 ; vérification du code postal afin qu'il n'ait que 5 chiffres
   * Conversions de certaines valeurs avec renommage des champs si nécessaire.
   * Conversion des données de date en date au sens R.
-  * Les appartements dont les prix ne sont pas fournis sont supprimés.
-  * Le script faisant ce travail est `P00_Projet_desc.R`.
+  * Les appartements dont les prix ne sont pas fournis ou hors norme sont supprimés.
 
 ---
 
@@ -25,26 +30,22 @@ output:
 
 * Nous nous sommes dit que les locataires étaient peut-être intéressés par une proximité entre leur location et les monuments parisiens.
 
-* Un peu de scrapbooking sur le site http://monumentsdeparis.net/ permet de récupérer les monuments parisiens ainsi que leurs adresses.
-* Une seconde étape est d'utiliser l'API REST `adresse.data.gouv.fr` pour récupérer les adresses dans un format harmonisé et les longitudes/latitudes.
-
-* L'étape suivante a été de déterminer pour chaque logement le nombre de monuments à moins de 100m, 200m, 500m et 1km.
-* Le script faisant ce travail est `P04_monuments.R`. Le résultat est stocké dans la table `P04_dist_monuments`.
+  * Un peu de scrapbooking sur le site http://monumentsdeparis.net/ permet de récupérer les monuments parisiens ainsi que leurs adresses.
+  * L'utilisation de l'API REST de `adresse.data.gouv.fr` permet de récupérer les adresses dans un format harmonisé avec les longitudes/latitudes.
+  * L'étape suivante a été de déterminer pour chaque logement le nombre de monuments à moins de 100m, 200m, 500m et 1km.
 
 ---
 
 # Les gares et stations de métro/RER
 
-* Comme pour les monuments, il est peut-être intéressant pour un locataire de chercher à ce que son logement soit proche de gares.
+* Comme pour les monuments, il est peut-être intéressant pour un locataire de chercher à ce que son logement soit proche de gares/stations de métro.
 
-* Pour en mesurer, une autre source de données est le fichier `accessibilite-des-gares-et-stations-metro-et-rer-ratp.csv` récupéré sur `https://www.data.gouv.fr/en/datasets/accessibilite-des-gares-et-stations-de-metro-et-rer-ratp-1/`.
-* Les retraitements de ce fichier consistent en :
-  * Ne garder que les adresses du département 75.
-  * Supprimer les doublons
-  * Séparer la longitude et la latitude en deux colonnes distinctes.
-
-* Et la dernière étape a consisté à déterminer le nombre de stations/gares à moins de 100m, 200m, 500m et 1km.
-* Le script faisant ce travail est `P01_ratp.R`. Le résultat est stocké dans la table `P01_dist_RATP`.
+  * Nous avons récupéré le fichier `accessibilite-des-gares-et-stations-metro-et-rer-ratp.csv` sur `https://www.data.gouv.fr/en/datasets/accessibilite-des-gares-et-stations-de-metro-et-rer-ratp-1/`.
+  * Les retraitements de ce fichier consistent en :
+    * Ne garder que les adresses du département 75.
+    * Supprimer les doublons
+    * Séparer la longitude et la latitude en deux colonnes distinctes.
+  * Nous avons ensuite pu déterminer le nombre de stations/gares à moins de 100m, 200m, 500m et 1km.
 
 ---
 
@@ -53,13 +54,14 @@ output:
 * Nous avons récupéré un fichier `reviews.csv` sur `http://insideairbnb.com/` contenant les revues des clients (environ 1 000 000 de lignes).
 * Nous avons tenté d'en extraire des informations mais la variété des langues a rendu son exploitation assez difficile.
 * De plus, notre but étant d'estimer le prix d'une location que l'on aurait à proposer, il nous a semblé difficile d'avoir des revues dès le début.
+* Cette piste a donc été écartée.
 
 ---
 
 # Fabrication des quartiers
 
 * Nous avons téléchargé les quartiers de Paris sur le site https://opendata.paris.fr/explore/dataset/quartier_paris/export/.
-* Nous avons exporté les id, latitudes, longitudes des différentes locations au format csv.
+* A partir de nos données Air Bnb, nous avons aussi récupéré les id, latitudes, longitudes des logements.
 
 * Ces deux sources ont été importées dans le logiciel QGIS. Son outil d'intersection nous a alors permis de déterminer à quels quartiers appartiennent chacune des locations.
 * Après cette opération, nous avons exporté le résultat dans le fichier `quartiers.csv`.
