@@ -4,13 +4,17 @@ author:
   - Charles Picard
   - Mathieu Giardini
   - David Boucher
-#abstract: "J'ai un appartement à Paris que je voudrais mettre en location sur Air BnB. A quel prix pourrais-je le louer ?"
 
 output:
   slidy_presentation: default
   beamer_presentation: default
   ioslides_presentation: default
+
 ---
+
+<center>
+![Air BnB à Paris](./images/slide0.jpg){width=60%}
+</center>
 
 ---
 
@@ -18,20 +22,43 @@ output:
 
 * Le site `http://insideairbnb.com/` propose des fichiers _csv_ contenant les données du site Air BnB. Nous avons donc récupéré un fichier `listings.csv` contenant environ 60 000 appartements à Paris.
 
-* Nous avons nettoyé ce tableau :
+<center>
+![Exemple airbnb](./images/slide_airbnb2.PNG){width=50%}
+</center>
+
+---
+
+# Nettoyage du fichier csv
+
+* Pour cela :
   * Filtrage sur le code postal afin de n'avoir que du 75 ; vérification du code postal afin qu'il n'ait que 5 chiffres
   * Conversions de certaines valeurs avec renommage des champs si nécessaire.
   * Conversion des données de date en date au sens R.
   * Les appartements dont les prix ne sont pas fournis ou hors norme sont supprimés.
 
+<center>
+![data airbnb](./images/slide_airbnb.PNG){width=80%}
+</center>
 ---
 
 # Les monuments de Paris
 
-* Nous nous sommes dit que les locataires étaient peut-être intéressés par une proximité entre leur location et les monuments parisiens.
+* Peut-être que les locataires sont intéressés par une proximité entre leur location et les monuments parisiens...
 
   * Un peu de scrapbooking sur le site http://monumentsdeparis.net/ permet de récupérer les monuments parisiens ainsi que leurs adresses.
+
+<center>
+![adresse.data.gouv.fr](./images/slide_monument2.PNG){width=500px}
+</center>
+
+---
+
   * L'utilisation de l'API REST de `adresse.data.gouv.fr` permet de récupérer les adresses dans un format harmonisé avec les longitudes/latitudes.
+
+<center>
+![Monuments parisiens](./images/slide_monument.PNG){width=70%}
+</center>
+
   * L'étape suivante a été de déterminer pour chaque logement le nombre de monuments à moins de 100m, 200m, 500m et 1km.
 
 ---
@@ -46,6 +73,10 @@ output:
     * Supprimer les doublons
     * Séparer la longitude et la latitude en deux colonnes distinctes.
   * Nous avons ensuite pu déterminer le nombre de stations/gares à moins de 100m, 200m, 500m et 1km.
+
+<center>
+![Transports à Paris](./images/slide_ratp.PNG){width=30%}
+</center>
 
 ---
 
@@ -66,7 +97,9 @@ output:
 * Ces deux sources ont été importées dans le logiciel QGIS. Son outil d'intersection nous a alors permis de déterminer à quels quartiers appartiennent chacune des locations.
 * Après cette opération, nous avons exporté le résultat dans le fichier `quartiers.csv`.
 
-![QGIS](./images/qgis.png){width=500px}
+<center>
+![QGIS](./images/qgis.png){width=40%}
+</center>
 
 ---
 
@@ -180,7 +213,7 @@ knitr::kable(tabl)
 
 # Random forest
 
-* Une random forest a été faite avec 500 arbres et les paramètres par défaut de R. Nous sommes toujours sur les variables :
+* Une random forest a été faite avec 500 arbres et les paramètres par défaut de R. Nous sommes toujours sur les neuf variables :
     * bedrooms, accommodates, l_qu, zipcode, host_total_listings_count, bathrooms, delai_inscription, nb_amen, summary_l
 
 ```{r resultRF,echo=F}
@@ -217,7 +250,7 @@ knitr::kable(tabl)
 
 ---
 
-# Comparison des 3 types de modèles avec les 9 variables sélectionnées
+# Comparaison des 3 types de modèles avec les 9 variables sélectionnées
 
 * 3 modèles finaux ont été sélectionnés :
   * Un modèle de **régression de Poisson** (GLM) pour prendre en compte la normalité du logarithme des prix
