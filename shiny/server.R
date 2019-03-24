@@ -1,7 +1,7 @@
 function(input, output) {
   
   output$nb_appart <- renderValueBox({
-    # Nb d'apaprtement
+    # Nb d'appartements
     valueBox(
       value = nrow(airbnb),
       subtitle = "Nombre d'appartements parisiens",

@@ -23,8 +23,8 @@ dashboardPage(skin = "red",
               dashboardSidebar(
                 sidebarMenu(
                   menuItem("Visualisation / Carto", tabName = "carto"),
-                  menuItem("Prédiction", tabName = "Autre"),
-                  menuItem("Méthodologie", tabName = "methodo")
+                  menuItem("Prédiction", tabName = "Autre")
+                  #menuItem("Méthodologie", tabName = "methodo")
                 )
               ),
               
@@ -71,7 +71,10 @@ dashboardPage(skin = "red",
                                                           startview = 'year'),
                                                 numericInput("host_total_listings_count", label="Combien avez vous eu de visiteurs ?", value = 1,min=1,step	=1)
                                               )),
-                            box( includeHTML("www/methodo.html")),
+                            box(title = "Méthodologie",
+                                collapsible = FALSE,
+                                a("Quelques explications sur les données, les modèles, etc.", href="notes.html", target='blank')),
+                            #box( includeHTML("www/methodo.html")),
                             box(title = "Prédiction du Prix de location de l'appartement", status = "success", solidHeader = TRUE,
                                 collapsible = FALSE
                                 ,tableOutput("price")
@@ -81,9 +84,9 @@ dashboardPage(skin = "red",
                               tags$img(src ="english.png"),tags$img(src ="french.png")
                             )
                           )
-                  ), 
-                  tabItem("methodo",
-                          a("test", href="notes.html", target='blank'))
+                  )
+                  #tabItem("methodo",
+                  #        a("test", href="notes.html", target='blank'))
                 )
               )
 )
