@@ -405,7 +405,7 @@ Charles Picard<br />Mathieu Giardini<br />David Boucher
 <li>Supprimer les doublons</li>
 <li>Séparer la longitude et la latitude en deux colonnes distinctes.</li>
 </ul></li>
-<li>Nous avons déterminé le nombre de stations/gares à moins de 100m, 200m, 500m et 1km.</li>
+<li>Nous avons ensuite pu déterminer le nombre de stations/gares à moins de 100m, 200m, 500m et 1km.</li>
 </ul></li>
 </ul>
 </div>
@@ -415,13 +415,14 @@ Charles Picard<br />Mathieu Giardini<br />David Boucher
 <li>Nous avons récupéré un fichier <code>reviews.csv</code> sur <code>http://insideairbnb.com/</code> contenant les revues des clients (environ 1 000 000 de lignes).</li>
 <li>Nous avons tenté d’en extraire des informations mais la variété des langues a rendu son exploitation assez difficile.</li>
 <li>De plus, notre but étant d’estimer le prix d’une location que l’on aurait à proposer, il nous a semblé difficile d’avoir des revues dès le début.</li>
+<li>Cette piste a donc été écartée.</li>
 </ul>
 </div>
 <div id="fabrication-des-quartiers" class="slide section level1">
 <h1>Fabrication des quartiers</h1>
 <ul>
 <li>Nous avons téléchargé les quartiers de Paris sur le site <a href="https://opendata.paris.fr/explore/dataset/quartier_paris/export/" class="uri">https://opendata.paris.fr/explore/dataset/quartier_paris/export/</a>.</li>
-<li><p>Nous avons exporté les id, latitudes, longitudes des différentes locations au format csv.</p></li>
+<li><p>A partir de nos données Air Bnb, nous avons aussi récupéré les id, latitudes, longitudes des logements.</p></li>
 <li>Ces deux sources ont été importées dans le logiciel QGIS. Son outil d’intersection nous a alors permis de déterminer à quels quartiers appartiennent chacune des locations.</li>
 <li><p>Après cette opération, nous avons exporté le résultat dans le fichier <code>quartiers.csv</code>.</p></li>
 </ul>
@@ -650,8 +651,169 @@ Charles Picard<br />Mathieu Giardini<br />David Boucher
 </tbody>
 </table>
 </div>
-<div class="slide section level1">
-
+<div id="random-forest" class="slide section level1">
+<h1>Random forest</h1>
+<ul>
+<li>Une random forest a été faite avec 500 arbres et les paramètres par défaut de R. Nous sommes toujours sur les variables :
+<ul>
+<li>bedrooms, accommodates, l_qu, zipcode, host_total_listings_count, bathrooms, delai_inscription, nb_amen, summary_l</li>
+</ul></li>
+</ul>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Indicateur</th>
+<th align="right">RF</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Average IB error</td>
+<td align="right">-0.0129354</td>
+</tr>
+<tr class="even">
+<td align="left"><span class="math inline">\(\sigma\)</span> IB error (RMSE)</td>
+<td align="right">37.7903014</td>
+</tr>
+<tr class="odd">
+<td align="left"><span class="math inline">\(R^2_a\)</span></td>
+<td align="right">0.6368411</td>
+</tr>
+<tr class="even">
+<td align="left">Average OB error</td>
+<td align="right">0.2455550</td>
+</tr>
+<tr class="odd">
+<td align="left"><span class="math inline">\(\sigma\)</span> OB error (RMSE)</td>
+<td align="right">36.7244688</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="modele-de-gradient-boosting-darbre-de-regression" class="slide section level1">
+<h1>Modèle de gradient boosting d’arbre de régression</h1>
+<ul>
+<li>3 modèles (réalisés avec nos 9 variables) ont été comparés pour tester les différents paramètres de la fonction <em>gbm()</em> :
+<ul>
+<li>Un premier avec les paramètres suivants :
+<ul>
+<li>shrinkage = 0.01 : pas lors de la descente du gradient</li>
+<li>interaction.depth = 1 : Nombre de noeuds de scission de chaque arbre de regression (donc 2 noeuds terminaux)</li>
+</ul></li>
+<li>Un second avec les paramètres suivants :
+<ul>
+<li>shrinkage = 0.1 : descente plus rapide que pour le modèle 1</li>
+<li>interaction.depth = 1 : Meme nombre de noeuds de scission que pour le modèle 1</li>
+</ul></li>
+</ul></li>
+<li>Un troisième avec les paramètres suivants :
+<ul>
+<li>shrinkage = 0.01 : pas de descente identique que pour le modèle 1</li>
+<li>interaction.depth = 2 : nombre de noeuds de scission plus important que pour le modèle 1, ce qui signifie des arbres de régression plus complexes</li>
+</ul></li>
+</ul>
+</div>
+<div id="resultats-de-gradient-boosting" class="slide section level1">
+<h1>Résultats de gradient boosting</h1>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Indicateur</th>
+<th align="right">GB1</th>
+<th align="right">GB2</th>
+<th align="right">GB3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Average IB error</td>
+<td align="right">0.0132347</td>
+<td align="right">0.0182773</td>
+<td align="right">0.0090789</td>
+</tr>
+<tr class="even">
+<td align="left"><span class="math inline">\(\sigma\)</span> IB error (RMSE)</td>
+<td align="right">40.7149516</td>
+<td align="right">40.4881667</td>
+<td align="right">38.4621048</td>
+</tr>
+<tr class="odd">
+<td align="left"><span class="math inline">\(R^2_a\)</span></td>
+<td align="right">0.5770005</td>
+<td align="right">0.5816997</td>
+<td align="right">0.6225164</td>
+</tr>
+<tr class="even">
+<td align="left">Average OB error</td>
+<td align="right">0.5295264</td>
+<td align="right">0.5157737</td>
+<td align="right">0.4467081</td>
+</tr>
+<tr class="odd">
+<td align="left"><span class="math inline">\(\sigma\)</span> OB error (RMSE)</td>
+<td align="right">40.7678482</td>
+<td align="right">40.6450388</td>
+<td align="right">39.5790871</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="comparison-des-3-types-de-modeles-avec-les-9-variables-selectionnees" class="slide section level1">
+<h1>Comparison des 3 types de modèles avec les 9 variables sélectionnées</h1>
+<ul>
+<li>3 modèles finaux ont été sélectionnés :
+<ul>
+<li>Un modèle de <strong>régression de Poisson</strong> (GLM) pour prendre en compte la normalité du logarithme des prix</li>
+<li>Un modèle de <strong>forêts aléatoires</strong> calibré avec 500 arbres et un paramètre <em>mtry</em> égal à 3</li>
+<li>Un modèle de <strong>gradient boosting d’arbre de régression</strong> calibré avec un <strong>shrinkage</strong> de 0.01 et un <em>interaction.depth</em> de 2</li>
+</ul></li>
+</ul>
+</div>
+<div id="resume-des-resultats" class="slide section level1">
+<h1>Résumé des résultats</h1>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Indicateur</th>
+<th align="right">GLM2</th>
+<th align="right">RF1</th>
+<th align="right">GB3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Average IB error</td>
+<td align="right">1.1819203</td>
+<td align="right">0.2480759</td>
+<td align="right">0.0090789</td>
+</tr>
+<tr class="even">
+<td align="left"><span class="math inline">\(\sigma\)</span> IB error (RMSE)</td>
+<td align="right">4.3799825</td>
+<td align="right">39.5490624</td>
+<td align="right">38.4621048</td>
+</tr>
+<tr class="odd">
+<td align="left"><span class="math inline">\(R^2_a\)</span></td>
+<td align="right">0.9950707</td>
+<td align="right">0.6008635</td>
+<td align="right">0.6225164</td>
+</tr>
+<tr class="even">
+<td align="left">Average OB error</td>
+<td align="right">0.7347344</td>
+<td align="right">0.3376634</td>
+<td align="right">0.4467081</td>
+</tr>
+<tr class="odd">
+<td align="left"><span class="math inline">\(\sigma\)</span> OB error (RMSE)</td>
+<td align="right">47.4262531</td>
+<td align="right">39.2330848</td>
+<td align="right">39.5790871</td>
+</tr>
+</tbody>
+</table>
+<p>Nous avons incorporé dans notre application Shiny le prix pour chacun des 3 modèles.</p>
 </div>
 
   <!-- dynamically load mathjax for compatibility with self-contained -->

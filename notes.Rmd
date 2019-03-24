@@ -178,4 +178,61 @@ knitr::kable(tabl)
 
 ---
 
+# Random forest
+
+* Une random forest a été faite avec 500 arbres et les paramètres par défaut de R. Nous sommes toujours sur les variables :
+    * bedrooms, accommodates, l_qu, zipcode, host_total_listings_count, bathrooms, delai_inscription, nb_amen, summary_l
+
+```{r resultRF,echo=F}
+tabl <- data.frame(Indicateur = c("Average IB error", "$\\sigma$ IB error (RMSE)", "$R^2_a$", "Average OB error", "$\\sigma$ OB error (RMSE)"),
+                   RF=c(-0.01293537, 37.79030141, 0.63684109, 0.24555499, 36.72446884))
+knitr::kable(tabl)
+```
+---
+
+# Modèle de gradient boosting d'arbre de régression
+
+* 3 modèles (réalisés avec nos 9 variables) ont été comparés pour tester les différents paramètres de la fonction *gbm()* :
+  * Un premier avec les paramètres suivants :
+    * shrinkage = 0.01 : pas lors de la descente du gradient
+    * interaction.depth = 1 : Nombre de noeuds de scission de chaque arbre de regression (donc 2 noeuds terminaux)
+  * Un second avec les paramètres suivants :
+    * shrinkage = 0.1 : descente plus rapide que pour le modèle 1
+    * interaction.depth = 1 : Meme nombre de noeuds de scission que pour le modèle 1
+* Un troisième avec les paramètres suivants :
+    * shrinkage = 0.01 : pas de descente identique que pour le modèle 1
+    * interaction.depth = 2 : nombre de noeuds de scission plus important que pour le modèle 1, ce qui signifie des arbres de régression plus complexes
+
+---
+
+# Résultats de gradient boosting
+
+```{r resultBoosting,echo=F}
+tabl <- data.frame(Indicateur = c("Average IB error", "$\\sigma$ IB error (RMSE)", "$R^2_a$", "Average OB error", "$\\sigma$ OB error (RMSE)"),
+                   GB1=c(0.0132347150777637, 40.7149516080917, 0.577000548690167, 0.529526398684977, 40.7678481983617),
+                   GB2=c(0.0182772855451852, 40.4881667247804, 0.58169969284445, 0.515773710719386, 40.6450388471167),
+                   GB3=c(0.00907893793537792, 38.4621048461559, 0.622516430636094, 0.446708052219003, 39.5790870564872))
+knitr::kable(tabl)
+```
+
+---
+
+# Comparison des 3 types de modèles avec les 9 variables sélectionnées
+
+* 3 modèles finaux ont été sélectionnés :
+  * Un modèle de **régression de Poisson** (GLM) pour prendre en compte la normalité du logarithme des prix
+  * Un modèle de **forêts aléatoires** calibré avec 500 arbres et un paramètre *mtry* égal à 3
+  * Un modèle de **gradient boosting d'arbre de régression** calibré avec un **shrinkage** de 0.01 et un *interaction.depth* de 2
+  
+# Résumé des résultats
+
+```{r result3Mod,echo=F}
+tabl <- data.frame(Indicateur = c("Average IB error", "$\\sigma$ IB error (RMSE)", "$R^2_a$", "Average OB error", "$\\sigma$ OB error (RMSE)"),
+                   GLM2=c(1.18192030421104, 4.37998251476438, 0.995070691872251, 0.734734397497239, 47.4262531471582),
+                   RF1=c(0.248075878500565, 39.5490623950428, 0.600863513782569, 0.337663433198099, 39.2330848198853),
+                   GB3=c(0.00907893793537792, 38.4621048461559, 0.622516430636094, 0.446708052219003, 39.5790870564872))
+knitr::kable(tabl)
+```
+
+Nous avons incorporé dans notre application Shiny le prix pour chacun des 3 modèles.
 
